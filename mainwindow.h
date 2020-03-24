@@ -25,6 +25,12 @@ class MainWindow : public QMainWindow {
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
+  inline void initLoad() {
+    if (load_file_list()) {
+      load_images();
+    }
+  }
+
  protected:
   void keyPressEvent(QKeyEvent *event) override;
 
@@ -36,6 +42,8 @@ class MainWindow : public QMainWindow {
   void on_loadButton_clicked();
   void ondrawPrev_clecked();
   void ondrawNext_clecked();
+
+  void on_cropButton_clicked();
 
  private:
   Ui::MainWindow *ui;

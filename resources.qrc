@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/json">
+        <file>ant-default.json</file>
+    </qresource>
+</RCC>

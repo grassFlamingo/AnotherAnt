@@ -45,8 +45,6 @@ void PaintBoard::wheelEvent(QWheelEvent *event) {
   QPoint cp2tl = mPixTopLeft - curPos;
 
   mPixTopLeft = curPos + cp2tl * fac;
-  mPixMoved.setX(0);
-  mPixMoved.setY(0);
 
   event->accept();
   repaint();
@@ -86,4 +84,6 @@ void PaintBoard::mouseReleaseEvent(QMouseEvent *event) {
     mPixTopLeft += mPixMoved;
   }
   setCursor(Qt::ArrowCursor);
+  mPixMoved.setX(0);
+  mPixMoved.setY(0);
 }

@@ -22,6 +22,7 @@ class WidgetClick : public QWidget {
 
  private:
   QPixmap mBackground;
+  QPoint mTopLeft;
 };
 
 #endif // QLABLECLICK_H
