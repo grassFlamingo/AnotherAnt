@@ -45,8 +45,12 @@ class MainWindow : public QMainWindow {
   LinkedRing<QPixmap> mPixRing;
   int mPixIndex;
 
-  inline QString next_piximage_path(int i = 1) {
+  inline int next_piximage_index(int i = 1) {
     mPixIndex = (mPixIndex + i + mFileList.size()) % mFileList.size();
+    return mPixIndex;
+  }
+
+  inline QString curr_piximage_path() {
     return Ant::path_join(mPath, mFileList[mPixIndex]);
   }
 };

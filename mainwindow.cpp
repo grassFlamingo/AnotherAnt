@@ -38,10 +38,10 @@ bool MainWindow::load_file_list() {
 }
 
 void MainWindow::load_images() {
-  ui->drawMain->setPixmap(
-      mPixRing.locate(0).scaled(ui->drawMain->size(), Qt::KeepAspectRatio));
-  ui->drawPrev->setPixmap(mPixRing.locate(-1));
-  ui->drawNext->setPixmap(mPixRing.locate(+1));
+  ui->drawMain->setPixmap(mPixRing.locate_item(0).scaled(ui->drawMain->size(),
+                                                         Qt::KeepAspectRatio));
+  ui->drawPrev->setPixmap(mPixRing.locate_item(-1));
+  ui->drawNext->setPixmap(mPixRing.locate_item(+1));
 }
 
 void MainWindow::on_loadButton_clicked() {
@@ -58,21 +58,39 @@ void MainWindow::on_loadButton_clicked() {
     return;
   }
 
-  mPixRing.locate(-1).load(next_piximage_path());
-  mPixRing.locate(0).load(next_piximage_path());
-  mPixRing.locate(+1).load(next_piximage_path());
+  auto ritem = mPixRing.locate(-1);
+  ritem->id = next_piximage_index();
+  ritem->item.load(curr_piximage_path());
+
+  ritem = mPixRing.locate(0);
+  ritem->id = next_piximage_index();
+  ritem->item.load(curr_piximage_path());
+
+  ritem = mPixRing.locate(1);
+  ritem->id = next_piximage_index();
+  ritem->item.load(curr_piximage_path());
 
   load_images();
 }
 
 void MainWindow::ondrawPrev_clecked() {
   mPixRing.back();
-  mPixRing.locate(-1).load(next_piximage_path(-1));
+  auto ritem = mPixRing.locate(-1);
+  if (ritem->id != mPixIndex) {
+    ritem->item.load(curr_piximage_path());
+    ritem->id = mPixIndex;
+  }
+  next_piximage_index(-1);
   load_images();
 }
 
 void MainWindow::ondrawNext_clecked() {
   mPixRing.step();
-  mPixRing.locate(1).load(next_piximage_path());
+  auto ritem = mPixRing.locate(1);
+  if (ritem->id != mPixIndex) {
+    ritem->item.load(curr_piximage_path());
+    ritem->id = mPixIndex;
+  }
+  next_piximage_index(1);
   load_images();
 }

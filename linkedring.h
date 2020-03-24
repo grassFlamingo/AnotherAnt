@@ -4,6 +4,11 @@
 #include <QPixmap>
 #include <QLinkedList>
 
+template <typename T>
+struct LinkedRingItem {
+  T item;
+  int id;
+};
 
 template <typename T>
 class LinkedRing {
@@ -13,7 +18,7 @@ class LinkedRing {
       capacity = 2;
     }
     mCapacity = capacity;
-    mItems = new T[capacity];
+    mItems = new LinkedRingItem<T>[capacity];
     mIndex = 0;
   }
 
@@ -30,12 +35,12 @@ class LinkedRing {
 
   /**
    * @brief locate at i
-   * i < 0 <-> previous i node
-   * i = 0 <-> current node
-   * i > 0 <-> next i node
+   * i < 0 <-> previous i node\\
+   * i = 0 <-> current node\\
+   * i > 0 <-> next i node\\
    * @return
    */
-  inline T& locate(int i = 0) {
+  LinkedRingItem<T>* locate(int i = 0) {
     int idx = mIndex;
     if (i != 0) {
       // > 0
@@ -44,16 +49,21 @@ class LinkedRing {
         idx = (idx + mCapacity) % mCapacity;
       }
     }
-    return mItems[idx];
+    return mItems + idx;
   }
 
-  inline T& operator[](int i) { return mItems[(i + mCapacity) % mCapacity]; }
+  inline T& locate_item(int i = 0) { return locate(i)->item; }
+  inline int& locate_id(int i = 0) { return locate(i)->id; }
 
-  inline T* begin() { return mItems; }
-  inline T* end() { return mItems + mCapacity; }
+  inline LinkedRingItem<T>& operator[](int i) {
+    return mItems[(i + mCapacity) % mCapacity];
+  }
+
+  inline LinkedRingItem<T>* begin() { return mItems; }
+  inline LinkedRingItem<T>* end() { return mItems + mCapacity; }
 
  private:
-  T* mItems;
+  LinkedRingItem<T>* mItems;
   int mIndex;
   int mCapacity;
 };
