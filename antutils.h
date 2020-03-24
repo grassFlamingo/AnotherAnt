@@ -39,11 +39,7 @@ class AntConfigure {
   }
 
   inline void setWorkspace(const QString& path) {
-    if (workspace() == path) {
-      return;
-    }
     mSelf.mJsonObj.insert("workspace", path);
-    mIsModified = true;
   }
 
   int saveConfigure();
@@ -53,7 +49,6 @@ class AntConfigure {
 
  private:
   QJsonObject mJsonObj;
-  bool mIsModified;
   QString mFileName;
   static AntConfigure mSelf;
 };

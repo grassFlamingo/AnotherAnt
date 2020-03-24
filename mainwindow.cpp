@@ -102,4 +102,13 @@ void MainWindow::ondrawNext_clecked() {
   load_images();
 }
 
-void MainWindow::on_cropButton_clicked() {}
+void MainWindow::on_cropLabel_editingFinished() {
+  QRect rect = ui->drawMain->rect();
+  QString txt = ui->cropLabel->text();
+  int w, h;
+  sscanf(txt.toLocal8Bit(), "%dx%d", &w, &h);
+  QRect pos(0, 0, w, h);
+  pos.moveCenter(rect.center());
+  ui->drawMain->setRectangle(pos);
+  ui->drawMain->setFocus();
+}

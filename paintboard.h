@@ -14,6 +14,8 @@ class PaintBoard : public QWidget {
 
   void setPixmap(const QPixmap &other);
 
+  void setRectangle(const QRect &rect, const QColor &color = Qt::darkRed);
+
  protected:
   /**
    * @brief wheelEvent: activate when mouse wheel
@@ -36,6 +38,8 @@ class PaintBoard : public QWidget {
   float mZoomf;
   bool mIsDrag;
   QPoint mDragStart;
+  QRect mRectangle;
+  QColor mRecColor;
 };
 
 #endif // PAINTBOARD_H

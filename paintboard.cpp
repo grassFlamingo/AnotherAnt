@@ -22,6 +22,12 @@ void PaintBoard::setPixmap(const QPixmap &other) {
   repaint();
 }
 
+void PaintBoard::setRectangle(const QRect &rect, const QColor &color) {
+  mRectangle = rect;
+  mRecColor = color;
+  repaint();
+}
+
 void PaintBoard::wheelEvent(QWheelEvent *event) {
   QPoint numPixels = event->pixelDelta();
   QPoint numDegrees = event->angleDelta() / 128;
@@ -56,6 +62,17 @@ void PaintBoard::paintEvent(QPaintEvent *event) {
 
   QRect loc(mPixTopLeft + mPixMoved, mPixShow.size());
   painter.drawPixmap(loc, mPixShow);
+
+  if (mRectangle.width() <= 2 || mRectangle.height() <= 2) {
+    return;
+  }
+
+  painter.setPen(mRecColor);
+  painter.drawRect(mRectangle);
+  painter.drawPoint(mRectangle.topLeft());
+  painter.drawPoint(mRectangle.topRight());
+  painter.drawPoint(mRectangle.bottomLeft());
+  painter.drawPoint(mRectangle.bottomRight());
 }
 
 void PaintBoard::mousePressEvent(QMouseEvent *event) {

@@ -43,7 +43,7 @@ class MainWindow : public QMainWindow {
   void ondrawPrev_clecked();
   void ondrawNext_clecked();
 
-  void on_cropButton_clicked();
+  void on_cropLabel_editingFinished();
 
  private:
   Ui::MainWindow *ui;

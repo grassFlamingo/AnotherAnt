@@ -16,7 +16,7 @@ QString Ant::path_join(const QString& parent, const QString& sub) {
 
 AntConfigure AntConfigure::mSelf = AntConfigure();
 
-AntConfigure::AntConfigure() : mIsModified(false) {}
+AntConfigure::AntConfigure() {}
 
 /**
  * @brief loadConfigure
@@ -59,7 +59,5 @@ int AntConfigure::saveConfigure() {
   QByteArray ba = doc.toJson(QJsonDocument::Indented);
   f.write(ba);
   f.close();
-  mIsModified = false;
-  qDebug() << "file" << mFileName << "saved";
   return ba.length();
 }
