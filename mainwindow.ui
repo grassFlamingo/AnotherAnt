@@ -48,18 +48,12 @@
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="drawMain">
+       <widget class="PaintBoard" name="drawMain" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -122,6 +116,12 @@
    <class>WidgetClick</class>
    <extends>QWidget</extends>
    <header location="global">widgetclick.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PaintBoard</class>
+   <extends>QWidget</extends>
+   <header location="global">paintboard.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

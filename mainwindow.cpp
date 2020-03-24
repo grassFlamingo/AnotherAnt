@@ -38,8 +38,7 @@ bool MainWindow::load_file_list() {
 }
 
 void MainWindow::load_images() {
-  ui->drawMain->setPixmap(mPixRing.locate_item(0).scaled(ui->drawMain->size(),
-                                                         Qt::KeepAspectRatio));
+  ui->drawMain->setPixmap(mPixRing.locate_item(0));
   ui->drawPrev->setPixmap(mPixRing.locate_item(-1));
   ui->drawNext->setPixmap(mPixRing.locate_item(+1));
 }

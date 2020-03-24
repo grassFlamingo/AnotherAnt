@@ -19,11 +19,13 @@ SOURCES += \
     antutils.cpp \
     main.cpp \
     mainwindow.cpp \
+  paintboard.cpp \
     widgetclick.cpp \
 
 HEADERS += \
     antutils.h \
     mainwindow.h \
+    paintboard.h \
     widgetclick.h \
     linkedring.h
 
