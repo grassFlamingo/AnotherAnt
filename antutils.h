@@ -16,6 +16,12 @@
 
 namespace Ant {
 
+template <typename T>
+struct tuple {
+  T a;
+  T b;
+};
+
 // all Qt supported image suffix
 const static QStringList Image_Suffix = {
     "*.bmp", "*.gif", "*.jpg", "*.jpeg", "*.png",

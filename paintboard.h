@@ -7,14 +7,44 @@
 #include <QWheelEvent>
 #include <QWidget>
 
+#include "antutils.h"
+
+/**
+ * @brief The PaintBoard class
+ *
+ * shot cuts:
+ * - h: <- move left
+ * - l: -> move right
+ * - j: ^ move up
+ * - k: v move down
+ * - a: expand
+ * - d: reduce
+ */
 class PaintBoard : public QWidget {
   Q_OBJECT
  public:
   explicit PaintBoard(QWidget *parent = nullptr);
 
-  void setPixmap(const QPixmap &other);
+  /**
+   * @brief setPixmap
+   * defalut locate at the center
+   * @param map
+   */
+  void setPixmap(const QPixmap &map);
+  void setRectangle(bool on = true, const QColor &color = Qt::darkRed);
+  inline bool isRectangleOn() const { return !mRectangle.isEmpty(); }
 
-  void setRectangle(const QRect &rect, const QColor &color = Qt::darkRed);
+ private:
+  void scalePixShow(float factor, const QPoint &center);
+  inline void scalePixShowDelta(int delta, const QPoint &center) {
+    float fac = delta * 0.05;
+    if (delta >= 0) {
+      fac += 1.0;
+    } else {
+      fac = -1.0 / (fac - 1.0);
+    }
+    scalePixShow(fac, center);
+  }
 
  protected:
   /**
@@ -27,6 +57,8 @@ class PaintBoard : public QWidget {
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
+
+  void keyPressEvent(QKeyEvent *event) override;
 
  signals:
 

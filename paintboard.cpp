@@ -3,10 +3,10 @@
 PaintBoard::PaintBoard(QWidget *parent)
     : QWidget(parent), mPixTopLeft(0, 0), mZoomf(1), mIsDrag(false) {}
 
-void PaintBoard::setPixmap(const QPixmap &other) {
-  mPixBackup = other;
+void PaintBoard::setPixmap(const QPixmap &map) {
+  mPixBackup = map;
 
-  mPixShow = other.scaled(size(), Qt::KeepAspectRatio);
+  mPixShow = map.scaled(size(), Qt::KeepAspectRatio);
   QSize ssize = mPixShow.size();
   QSize bsize = mPixBackup.size();
 
@@ -22,10 +22,27 @@ void PaintBoard::setPixmap(const QPixmap &other) {
   repaint();
 }
 
-void PaintBoard::setRectangle(const QRect &rect, const QColor &color) {
-  mRectangle = rect;
+void PaintBoard::setRectangle(bool on, const QColor &color) {
+  if (!on) {
+    mRectangle.setWidth(0);
+    mRectangle.setHeight(0);
+    repaint();
+    return;
+  }
+  QRect rec = this->rect();
+  int h = rec.height() / 5;
+  mRectangle.setRect(0, 0, 4 * h, 4 * h);
+  mRectangle.moveCenter(rec.center());
   mRecColor = color;
   repaint();
+}
+
+void PaintBoard::scalePixShow(float factor, const QPoint &center) {
+  mZoomf *= factor;
+  mPixShow = mPixBackup.scaled(mPixBackup.size() * mZoomf, Qt::KeepAspectRatio);
+  // relative to this widget
+  QPoint cp2tl = mPixTopLeft - center;
+  mPixTopLeft = center + cp2tl * factor;
 }
 
 void PaintBoard::wheelEvent(QWheelEvent *event) {
@@ -41,17 +58,7 @@ void PaintBoard::wheelEvent(QWheelEvent *event) {
     event->accept();
     return;
   }
-  float fac = delta > 0 ? 1.05 : 1.0 / 1.05;
-  mZoomf *= fac;
-
-  mPixShow = mPixBackup.scaled(mPixBackup.size() * mZoomf, Qt::KeepAspectRatio);
-  // relative to this widget
-  QPoint curPos = event->pos();
-
-  QPoint cp2tl = mPixTopLeft - curPos;
-
-  mPixTopLeft = curPos + cp2tl * fac;
-
+  scalePixShowDelta(delta, event->pos());
   event->accept();
   repaint();
 }
@@ -63,7 +70,7 @@ void PaintBoard::paintEvent(QPaintEvent *event) {
   QRect loc(mPixTopLeft + mPixMoved, mPixShow.size());
   painter.drawPixmap(loc, mPixShow);
 
-  if (mRectangle.width() <= 2 || mRectangle.height() <= 2) {
+  if (mRectangle.isEmpty()) {
     return;
   }
 
@@ -103,4 +110,33 @@ void PaintBoard::mouseReleaseEvent(QMouseEvent *event) {
   setCursor(Qt::ArrowCursor);
   mPixMoved.setX(0);
   mPixMoved.setY(0);
+}
+
+void PaintBoard::keyPressEvent(QKeyEvent *event) {
+  QWidget::keyPressEvent(event);
+  char key = QChar::toLower(event->key());
+  const QPoint dir[4] = {{-5, 0}, {5, 0}, {0, -5}, {0, 5}};
+  switch (key) {
+    case 'h':
+      mPixTopLeft += dir[0];
+      break;
+    case 'l':
+      mPixTopLeft += dir[1];
+      break;
+    case 'j':
+      mPixTopLeft += dir[2];
+      break;
+    case 'k':
+      mPixTopLeft += dir[3];
+      break;
+    case 'a':
+      scalePixShowDelta(1, this->rect().center());
+      break;
+    case 'd':
+      scalePixShowDelta(-1, this->rect().center());
+      break;
+    default:
+      break;
+  }
+  repaint();
 }

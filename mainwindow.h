@@ -40,10 +40,11 @@ class MainWindow : public QMainWindow {
 
  private slots:
   void on_loadButton_clicked();
-  void ondrawPrev_clecked();
-  void ondrawNext_clecked();
+  void onDrawPrevClicked();
+  void onDrawNextClicked();
 
   void on_cropLabel_editingFinished();
+  void on_showBoxButton_clicked();
 
  private:
   Ui::MainWindow *ui;

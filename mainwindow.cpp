@@ -8,21 +8,30 @@ MainWindow::MainWindow(QWidget *parent)
 
   ui->mainPathView->setText(mPath);
 
-  connect(ui->drawNext, SIGNAL(clicked()), this, SLOT(ondrawNext_clecked()));
-  connect(ui->drawPrev, SIGNAL(clicked()), this, SLOT(ondrawPrev_clecked()));
+  connect(ui->drawNext, SIGNAL(clicked()), this, SLOT(onDrawNextClicked()));
+  connect(ui->drawPrev, SIGNAL(clicked()), this, SLOT(onDrawPrevClicked()));
 }
 
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
   QMainWindow::keyPressEvent(event);
-  switch (QChar::toLower(event->key())) {
-    case 'h':
-      ondrawPrev_clecked();
-      break;
-    case 'l':
-      ondrawNext_clecked();
-      break;
+  char key = QChar::toLower(event->key());
+  // Ctrl+Key
+  if (event->modifiers() == Qt::ControlModifier) {
+    switch (key) {
+      case 'h':
+        onDrawPrevClicked();
+        break;
+      case 'l':
+        onDrawNextClicked();
+        break;
+      default:
+        break;
+    }
+  }
+
+  switch (key) {
     case 'q':
       close();
     default:
@@ -80,7 +89,7 @@ void MainWindow::on_loadButton_clicked() {
   Ant::conf().saveConfigure();
 }
 
-void MainWindow::ondrawPrev_clecked() {
+void MainWindow::onDrawPrevClicked() {
   mPixRing.back();
   auto ritem = mPixRing.locate(-1);
   if (ritem->id != mPixIndex) {
@@ -91,7 +100,7 @@ void MainWindow::ondrawPrev_clecked() {
   load_images();
 }
 
-void MainWindow::ondrawNext_clecked() {
+void MainWindow::onDrawNextClicked() {
   mPixRing.step();
   auto ritem = mPixRing.locate(1);
   if (ritem->id != mPixIndex) {
@@ -103,12 +112,23 @@ void MainWindow::ondrawNext_clecked() {
 }
 
 void MainWindow::on_cropLabel_editingFinished() {
-  QRect rect = ui->drawMain->rect();
+  //  QRect rect = ui->drawMain->rect();
   QString txt = ui->cropLabel->text();
   int w, h;
   sscanf(txt.toLocal8Bit(), "%dx%d", &w, &h);
-  QRect pos(0, 0, w, h);
-  pos.moveCenter(rect.center());
-  ui->drawMain->setRectangle(pos);
+}
+
+void MainWindow::on_showBoxButton_clicked() {
+  if (ui->drawMain->isRectangleOn()) {
+    ui->drawMain->setRectangle(false);
+    ui->cropLabel->setReadOnly(false);
+    ui->cropLabel->setFrame(true);
+    ui->showBoxButton->setText("show box");
+  } else {
+    ui->drawMain->setRectangle(true);
+    ui->cropLabel->setReadOnly(true);
+    ui->cropLabel->setFrame(false);
+    ui->showBoxButton->setText("hide box");
+  }
   ui->drawMain->setFocus();
 }

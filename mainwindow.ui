@@ -108,9 +108,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="frame">
-           <bool>false</bool>
-          </property>
           <property name="alignment">
            <set>Qt::AlignJustify|Qt::AlignTop</set>
           </property>
@@ -132,9 +129,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="cropButton">
+       <widget class="QPushButton" name="showBoxButton">
         <property name="text">
-         <string>draw box</string>
+         <string>show box</string>
         </property>
        </widget>
       </item>
@@ -223,7 +220,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>loadButton</tabstop>
-  <tabstop>cropButton</tabstop>
+  <tabstop>showBoxButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
