@@ -4,15 +4,23 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), mPixRing(16) {
   ui->setupUi(this);
-  mPath = Ant::conf().workspace();
+  mPath = Ant::ac.workspace();
 
   ui->mainPathView->setText(mPath);
+  ui->drawMain->setFocus();
 
   connect(ui->drawNext, SIGNAL(clicked()), this, SLOT(onDrawNextClicked()));
   connect(ui->drawPrev, SIGNAL(clicked()), this, SLOT(onDrawPrevClicked()));
 }
 
 MainWindow::~MainWindow() { delete ui; }
+
+void MainWindow::initLoad() {
+  if (load_file_list()) {
+    load_images();
+  }
+  ui->cropLabel->setText(Ant::ac.cropsize(&mCropsize.x, &mCropsize.y));
+}
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
   QMainWindow::keyPressEvent(event);
@@ -85,8 +93,8 @@ void MainWindow::on_loadButton_clicked() {
     return;
   }
   load_images();
-  Ant::conf().setWorkspace(mPath);
-  Ant::conf().saveConfigure();
+  Ant::ac.setWorkspace(mPath);
+  Ant::ac.saveConfigure();
 }
 
 void MainWindow::onDrawPrevClicked() {
@@ -114,8 +122,9 @@ void MainWindow::onDrawNextClicked() {
 void MainWindow::on_cropLabel_editingFinished() {
   //  QRect rect = ui->drawMain->rect();
   QString txt = ui->cropLabel->text();
-  int w, h;
-  sscanf(txt.toLocal8Bit(), "%dx%d", &w, &h);
+  Ant::ac.unpackCropsize(txt, &mCropsize.x, &mCropsize.y);
+  Ant::ac.setCropsize(mCropsize.x, mCropsize.y);
+  Ant::ac.saveConfigure();
 }
 
 void MainWindow::on_showBoxButton_clicked() {
@@ -132,3 +141,5 @@ void MainWindow::on_showBoxButton_clicked() {
   }
   ui->drawMain->setFocus();
 }
+
+void MainWindow::on_antButton_clicked() { mAntBoard.show(); }

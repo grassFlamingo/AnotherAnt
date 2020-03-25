@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   int si = rpath.lastIndexOf('/');
   rpath.chop(rpath.length() - si);
   rpath.append("/ant-conf.json");
-  Ant::conf().loadConfigure(rpath);
+  Ant::ac.loadConfigure(rpath);
 
   MainWindow w;
   w.show();

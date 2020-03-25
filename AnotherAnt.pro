@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+  antstatusboard.cpp \
     antutils.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
     widgetclick.cpp \
 
 HEADERS += \
+    antstatusboard.h \
     antutils.h \
     mainwindow.h \
     paintboard.h \
@@ -30,6 +32,7 @@ HEADERS += \
     linkedring.h
 
 FORMS += \
+    antstatusboard.ui \
     mainwindow.ui
 
 TRANSLATIONS += \

@@ -7,9 +7,9 @@
 #include <QLinkedList>
 #include <QMainWindow>
 #include <QMessageBox>
-
 #include <QDir>
 
+#include "antstatusboard.h"
 #include "antutils.h"
 #include "linkedring.h"
 #include "widgetclick.h"
@@ -25,11 +25,7 @@ class MainWindow : public QMainWindow {
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
-  inline void initLoad() {
-    if (load_file_list()) {
-      load_images();
-    }
-  }
+  void initLoad();
 
  protected:
   void keyPressEvent(QKeyEvent *event) override;
@@ -40,20 +36,14 @@ class MainWindow : public QMainWindow {
 
  private slots:
   void on_loadButton_clicked();
+  void on_cropLabel_editingFinished();
+  void on_showBoxButton_clicked();
+  void on_antButton_clicked();
+
   void onDrawPrevClicked();
   void onDrawNextClicked();
 
-  void on_cropLabel_editingFinished();
-  void on_showBoxButton_clicked();
-
  private:
-  Ui::MainWindow *ui;
-  QString mPath;
-  QStringList mFileList;
-
-  LinkedRing<QPixmap> mPixRing;
-  int mPixIndex;
-
   inline int next_piximage_index(int i = 1) {
     mPixIndex = (mPixIndex + i + mFileList.size()) % mFileList.size();
     return mPixIndex;
@@ -62,5 +52,15 @@ class MainWindow : public QMainWindow {
   inline QString curr_piximage_path() {
     return Ant::path_join(mPath, mFileList[mPixIndex]);
   }
+
+ private:
+  Ui::MainWindow *ui;
+  QString mPath;
+  QStringList mFileList;
+
+  LinkedRing<QPixmap> mPixRing;
+  int mPixIndex;
+  Ant::tuple<int> mCropsize;
+  AntStatusBoard mAntBoard;
 };
 #endif // MAINWINDOW_H

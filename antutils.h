@@ -18,8 +18,8 @@ namespace Ant {
 
 template <typename T>
 struct tuple {
-  T a;
-  T b;
+  T x;
+  T y;
 };
 
 // all Qt supported image suffix
@@ -40,12 +40,27 @@ class AntConfigure {
   static int loadConfigure(const QString& filename);
   inline static AntConfigure& configure() { return mSelf; }
 
-  inline QString workspace() const {
-    return mSelf.mJsonObj["workspace"].toString();
+  inline QString workspace() const { return mJsonObj["workspace"].toString(); }
+  inline void setWorkspace(const QString& path) {
+    mJsonObj.insert("workspace", path);
   }
 
-  inline void setWorkspace(const QString& path) {
-    mSelf.mJsonObj.insert("workspace", path);
+  inline void unpackCropsize(const QString& str, int* w, int* h) {
+    sscanf(str.toLocal8Bit(), "%dx%d", w, h);
+  }
+  inline QString cropsize() const { return mJsonObj["cropsize"].toString(); }
+  inline QString cropsize(int* w, int* h) {
+    QString crop = cropsize();
+    unpackCropsize(crop, w, h);
+    return crop;
+  }
+  inline void setCropsize(int w, int h) {
+    mJsonObj.insert("cropsize", QString::asprintf("%dx%d", w, h));
+  }
+
+  inline QString outspace() const { return mJsonObj["outspace"].toString(); }
+  inline void setOutspace(const QString& path) {
+    mJsonObj.insert("outspace", path);
   }
 
   int saveConfigure();
@@ -59,7 +74,7 @@ class AntConfigure {
   static AntConfigure mSelf;
 };
 
-inline AntConfigure& conf() { return AntConfigure::configure(); }
+static AntConfigure& ac = AntConfigure::configure();
 
 };  // namespace Ant
 
