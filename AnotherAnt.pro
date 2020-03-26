@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
   antstatusboard.cpp \
+  anttinymessage.cpp \
     antutils.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 
 HEADERS += \
     antstatusboard.h \
+    anttinymessage.h \
     antutils.h \
     mainwindow.h \
     paintboard.h \
@@ -33,6 +35,7 @@ HEADERS += \
 
 FORMS += \
     antstatusboard.ui \
+    anttinymessage.ui \
     mainwindow.ui
 
 TRANSLATIONS += \

@@ -36,15 +36,7 @@ class PaintBoard : public QWidget {
 
  private:
   void scalePixShow(float factor, const QPoint &center);
-  inline void scalePixShowDelta(int delta, const QPoint &center) {
-    float fac = delta * 0.05;
-    if (delta >= 0) {
-      fac += 1.0;
-    } else {
-      fac = -1.0 / (fac - 1.0);
-    }
-    scalePixShow(fac, center);
-  }
+  void scalePixShowDelta(int delta, const QPoint &center);
 
  protected:
   /**
@@ -67,8 +59,9 @@ class PaintBoard : public QWidget {
   QPixmap mPixShow;
   QPoint mPixTopLeft;
   QPoint mPixMoved;
-  float mZoomf;
   bool mIsDrag;
+  double mZoomf;
+  double mZoomBase;
   QPoint mDragStart;
   QRect mRectangle;
   QColor mRecColor;

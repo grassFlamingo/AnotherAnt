@@ -46,6 +46,12 @@ int AntConfigure::loadConfigure(const QString& filename) {
   }
   mSelf.mJsonObj = doc.object();
   mSelf.mFileName = QString(filename);
+
+  // out space is not exisis
+  QString os = mSelf.outspace();
+  if (os.isEmpty() || !QFile::exists(os)) {
+    QDir().mkpath(os);
+  }
   return true;
 }
 

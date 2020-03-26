@@ -24,22 +24,17 @@ void MainWindow::initLoad() {
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
   QMainWindow::keyPressEvent(event);
-  char key = QChar::toLower(event->key());
+  int key = QChar::toLower(event->key());
   // Ctrl+Key
-  if (event->modifiers() == Qt::ControlModifier) {
-    switch (key) {
-      case 'h':
-        onDrawPrevClicked();
-        break;
-      case 'l':
-        onDrawNextClicked();
-        break;
-      default:
-        break;
-    }
-  }
+  //  if (event->modifiers() == Qt::ControlModifier) {}
 
   switch (key) {
+    case Qt::Key_Right:
+      onDrawNextClicked();
+      break;
+    case Qt::Key_Left:
+      onDrawPrevClicked();
+      break;
     case 'q':
       close();
     default:
@@ -78,25 +73,6 @@ void MainWindow::load_images() {
   ui->drawNext->setPixmap(mPixRing.locate_item(+1));
 }
 
-void MainWindow::on_loadButton_clicked() {
-  QString tpath = QFileDialog::getExistingDirectory(
-      this, "open a directory", mPath, QFileDialog::ShowDirsOnly);
-  if(tpath.isEmpty()) {
-    QMessageBox::warning(this, "Directory Warning", "Current directory is empty.", QMessageBox::Ok);
-    return;
-  }
-  mPath = tpath;
-  ui->mainPathView->setText(mPath);
-  if (!load_file_list()) {
-    QMessageBox::warning(this, "Directory Warning", "No Image Files detected.",
-                         QMessageBox::Ok);
-    return;
-  }
-  load_images();
-  Ant::ac.setWorkspace(mPath);
-  Ant::ac.saveConfigure();
-}
-
 void MainWindow::onDrawPrevClicked() {
   mPixRing.back();
   auto ritem = mPixRing.locate(-1);
@@ -130,13 +106,9 @@ void MainWindow::on_cropLabel_editingFinished() {
 void MainWindow::on_showBoxButton_clicked() {
   if (ui->drawMain->isRectangleOn()) {
     ui->drawMain->setRectangle(false);
-    ui->cropLabel->setReadOnly(false);
-    ui->cropLabel->setFrame(true);
     ui->showBoxButton->setText("show box");
   } else {
     ui->drawMain->setRectangle(true);
-    ui->cropLabel->setReadOnly(true);
-    ui->cropLabel->setFrame(false);
     ui->showBoxButton->setText("hide box");
   }
   ui->drawMain->setFocus();

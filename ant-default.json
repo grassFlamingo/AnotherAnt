@@ -1,5 +1,6 @@
 {
     "workspace": ".",
     "outspace": ".",
-    "cropsize": "128x128"
+    "cropsize": "128x128",
+    "zoomf": 0.50
 }

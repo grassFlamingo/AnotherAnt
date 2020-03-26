@@ -1,7 +1,9 @@
 #include "paintboard.h"
 
 PaintBoard::PaintBoard(QWidget *parent)
-    : QWidget(parent), mPixTopLeft(0, 0), mZoomf(1), mIsDrag(false) {}
+    : QWidget(parent), mPixTopLeft(0, 0), mIsDrag(false), mZoomf(1) {
+  mZoomBase = Ant::ac.zoomf() / 10.0;
+}
 
 void PaintBoard::setPixmap(const QPixmap &map) {
   mPixBackup = map;
@@ -43,6 +45,16 @@ void PaintBoard::scalePixShow(float factor, const QPoint &center) {
   // relative to this widget
   QPoint cp2tl = mPixTopLeft - center;
   mPixTopLeft = center + cp2tl * factor;
+}
+
+void PaintBoard::scalePixShowDelta(int delta, const QPoint &center) {
+  float fac = delta * mZoomBase;
+  if (delta >= 0) {
+    fac += 1.0;
+  } else {
+    fac = -1.0 / (fac - 1.0);
+  }
+  scalePixShow(fac, center);
 }
 
 void PaintBoard::wheelEvent(QWheelEvent *event) {

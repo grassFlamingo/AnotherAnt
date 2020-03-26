@@ -14,37 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="6" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="cancleButton">
-       <property name="text">
-        <string>Cancle</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="saveButton">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
    <item row="0" column="0">
     <spacer name="verticalSpacerPrev">
      <property name="orientation">
@@ -74,19 +43,6 @@
       <widget class="QLineEdit" name="workspaceEdit"/>
      </item>
     </layout>
-   </item>
-   <item row="5" column="0">
-    <spacer name="verticalSpacerNext">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>157</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayoutos" stretch="3,7">
@@ -118,12 +74,74 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="cropsizeEdit"/>
+      <widget class="QLineEdit" name="cropsizeEdit">
+       <property name="placeholderText">
+        <string>128x128</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item row="4" column="0">
-    <widget class="QComboBox" name="comboBox"/>
+    <layout class="QHBoxLayout" name="horizontalLayoutzf" stretch="3,7">
+     <item>
+      <widget class="QLabel" name="zoomfLabel">
+       <property name="text">
+        <string>zoom factor</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="zoomfBox"/>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="0">
+    <spacer name="verticalSpacerNext">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>157</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="6" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancleButton">
+       <property name="text">
+        <string>Cancle</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -7,8 +7,12 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QFileSystemModel>
+#include <QMouseEvent>
+#include <QStringList>
+#include <QStringListModel>
 #include <QWidget>
 
+#include "anttinymessage.h"
 #include "antutils.h"
 
 namespace Ui {
@@ -22,26 +26,21 @@ class AntStatusBoard : public QWidget {
   explicit AntStatusBoard(QWidget *parent = nullptr);
   ~AntStatusBoard();
 
- private:
-  /**
-   * @brief path_compitition
-   * if path is end with '/' list is sub-directories
-   * else show its bast match
-   * @param path
-   */
-  QStringList path_compitition(const QString &path);
+ protected:
+  void mousePressEvent(QMouseEvent *event) override;
 
  private slots:
   void on_saveButton_clicked();
   void on_workspaceEdit_textEdited(const QString &path);
   void on_outspaceEdit_textEdited(const QString &path);
-
-  void on_workspaceEdit_editingFinished();
+  void on_zoomfBox_valueChanged(double zf);
 
  private:
   Ui::AntStatusBoard *ui;
   QPalette mPassPalete;
   QPalette mWarnPalete;
+  QCompleter mCompleter;
+  QFileSystemModel mFsm;
 };
 
 #endif // ANTSTATUSBOARD_H

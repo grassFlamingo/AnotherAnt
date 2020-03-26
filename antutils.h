@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 
 #include <QJsonArray>
@@ -61,6 +62,18 @@ class AntConfigure {
   inline QString outspace() const { return mJsonObj["outspace"].toString(); }
   inline void setOutspace(const QString& path) {
     mJsonObj.insert("outspace", path);
+  }
+
+  inline double zoomf() const { return mJsonObj["zoomf"].toDouble(0.05); }
+  /**
+   * @brief setZoomf
+   * @param zf > 0
+   */
+  inline void setZoomf(double zf) {
+    if (zf <= 0) {
+      return;
+    }
+    mJsonObj.insert("zoomf", zf);
   }
 
   int saveConfigure();
