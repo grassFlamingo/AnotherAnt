@@ -34,6 +34,8 @@ class PaintBoard : public QWidget {
   void setRectangle(bool on = true, const QColor &color = Qt::darkRed);
   inline bool isRectangleOn() const { return !mRectangle.isEmpty(); }
 
+  inline void setZoomf(double zf) { mZoomBase = zf / 10.0; }
+
  private:
   void scalePixShow(float factor, const QPoint &center);
   void scalePixShowDelta(int delta, const QPoint &center);

@@ -4,9 +4,6 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), mPixRing(16) {
   ui->setupUi(this);
-  mPath = Ant::ac.workspace();
-
-  ui->mainPathView->setText(mPath);
   ui->drawMain->setFocus();
 
   connect(ui->drawNext, SIGNAL(clicked()), this, SLOT(onDrawNextClicked()));
@@ -16,6 +13,15 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::initLoad() {
+  mPathws = Ant::ac.workspace();
+  mPathos = Ant::ac.outspace();
+  ui->drawMain->setZoomf(Ant::ac.zoomf());
+
+  if (mPathws.endsWith(QDir::separator())) {
+    mPathws.chop(1);
+  }
+  ui->mainPathView->setText(mPathws.section(QDir::separator(), -1));
+
   if (load_file_list()) {
     load_images();
   }
@@ -43,7 +49,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 bool MainWindow::load_file_list() {
-  QDir path(mPath);
+  QDir path(mPathws);
   path.setNameFilters(Ant::Image_Suffix);
   mFileList = path.entryList(QDir::Files);
   mPixIndex = -1;
@@ -114,4 +120,7 @@ void MainWindow::on_showBoxButton_clicked() {
   ui->drawMain->setFocus();
 }
 
-void MainWindow::on_antButton_clicked() { mAntBoard.show(); }
+void MainWindow::on_antButton_clicked() {
+  mAntBoard.exec();
+  initLoad();
+}

@@ -2,7 +2,7 @@
 #include "ui_antstatusboard.h"
 
 AntStatusBoard::AntStatusBoard(QWidget *parent)
-    : QWidget(parent), ui(new Ui::AntStatusBoard) {
+    : QDialog(parent), ui(new Ui::AntStatusBoard) {
   ui->setupUi(this);
   setWindowTitle("Ant Status Board");
   ui->workspaceEdit->setText(Ant::ac.workspace());

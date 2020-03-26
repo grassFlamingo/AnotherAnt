@@ -49,17 +49,19 @@ class MainWindow : public QMainWindow {
   }
 
   inline QString curr_piximage_path() {
-    return Ant::path_join(mPath, mFileList[mPixIndex]);
+    return Ant::path_join(mPathws, mFileList[mPixIndex]);
   }
 
  private:
   Ui::MainWindow *ui;
-  QString mPath;
+  QString mPathws;
+  QString mPathos;
   QStringList mFileList;
 
   LinkedRing<QPixmap> mPixRing;
   int mPixIndex;
   Ant::tuple<int> mCropsize;
   AntStatusBoard mAntBoard;
+  bool isEditMode;
 };
 #endif // MAINWINDOW_H

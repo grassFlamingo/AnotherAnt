@@ -3,6 +3,7 @@
 
 #include <QCompleter>
 #include <QDebug>
+#include <QDialog>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
@@ -10,7 +11,6 @@
 #include <QMouseEvent>
 #include <QStringList>
 #include <QStringListModel>
-#include <QWidget>
 
 #include "anttinymessage.h"
 #include "antutils.h"
@@ -19,7 +19,7 @@ namespace Ui {
 class AntStatusBoard;
 }
 
-class AntStatusBoard : public QWidget {
+class AntStatusBoard : public QDialog {
   Q_OBJECT
 
  public:
