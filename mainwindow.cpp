@@ -17,6 +17,8 @@ void MainWindow::initLoad() {
   mPathos = Ant::ac.outspace();
   ui->drawMain->setZoomf(Ant::ac.zoomf());
 
+  Ant::ac.cropsize(&mCropsize.x, &mCropsize.y);
+
   if (mPathws.endsWith(QDir::separator())) {
     mPathws.chop(1);
   }
@@ -26,6 +28,9 @@ void MainWindow::initLoad() {
     load_images();
   }
   ui->cropLabel->setText(Ant::ac.cropsize(&mCropsize.x, &mCropsize.y));
+  if (ui->drawMain->isRectangleOn()) {
+    ui->drawMain->setRectangle(true, (float)mCropsize.x / (float)mCropsize.y);
+  }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
@@ -101,20 +106,14 @@ void MainWindow::onDrawNextClicked() {
   load_images();
 }
 
-void MainWindow::on_cropLabel_editingFinished() {
-  //  QRect rect = ui->drawMain->rect();
-  QString txt = ui->cropLabel->text();
-  Ant::ac.unpackCropsize(txt, &mCropsize.x, &mCropsize.y);
-  Ant::ac.setCropsize(mCropsize.x, mCropsize.y);
-  Ant::ac.saveConfigure();
-}
-
 void MainWindow::on_showBoxButton_clicked() {
   if (ui->drawMain->isRectangleOn()) {
+    isEditMode = true;
     ui->drawMain->setRectangle(false);
     ui->showBoxButton->setText("show box");
   } else {
-    ui->drawMain->setRectangle(true);
+    isEditMode = false;
+    ui->drawMain->setRectangle(true, (float)mCropsize.x / (float)mCropsize.y);
     ui->showBoxButton->setText("hide box");
   }
   ui->drawMain->setFocus();

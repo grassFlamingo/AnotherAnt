@@ -3,6 +3,12 @@
 using namespace Ant;
 using Ant::AntConfigure;
 
+QStringList Ant::listImageNames(const QString& root) {
+  QDir path(root);
+  path.setNameFilters(Ant::Image_Suffix);
+  return path.entryList(QDir::Files);
+}
+
 QString Ant::path_join(const QString& parent, const QString& sub) {
   QString out(parent);
   if (!parent.endsWith("/")) {
@@ -66,4 +72,27 @@ int AntConfigure::saveConfigure() {
   f.write(ba);
   f.close();
   return ba.length();
+}
+
+/************************** AntEditProxy **************************/
+
+AntEditProxy::AntEditProxy() : mCheckList(NULL) {}
+
+AntEditProxy::~AntEditProxy() {
+  if (mCheckList != NULL) {
+    delete mCheckList;
+  }
+}
+
+void AntEditProxy::setWorkspace(const QString& wp) {
+  mWorkspace = wp;
+  QStringList imgs = listImageNames(wp);
+  mCheckList = new QVector<bool>(imgs.size(), false);
+}
+
+void AntEditProxy::setOutspace(const QString& os) {
+  mOutspace = os;
+  if (!QFile::exists(os)) {
+    QDir().mkdir(os);
+  }
 }

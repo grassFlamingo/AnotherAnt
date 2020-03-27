@@ -39,7 +39,9 @@ void AntStatusBoard::on_saveButton_clicked() {
       QDir().mkpath(os);
       Ant::ac.setOutspace(os);
     }
+    return;
   }
+  Ant::ac.setCropsize(ui->cropsizeEdit->text());
   double zf = ui->zoomfBox->value();
   if (zf > 0) {
     Ant::ac.setZoomf(zf);

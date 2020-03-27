@@ -24,7 +24,7 @@ void PaintBoard::setPixmap(const QPixmap &map) {
   repaint();
 }
 
-void PaintBoard::setRectangle(bool on, const QColor &color) {
+void PaintBoard::setRectangle(bool on, float whratio, const QColor &color) {
   if (!on) {
     mRectangle.setWidth(0);
     mRectangle.setHeight(0);
@@ -32,8 +32,13 @@ void PaintBoard::setRectangle(bool on, const QColor &color) {
     return;
   }
   QRect rec = this->rect();
-  int h = rec.height() / 5;
-  mRectangle.setRect(0, 0, 4 * h, 4 * h);
+  int h = rec.height() / 6;
+  int w = rec.width() / 6;
+  if (h * whratio > w) {
+    mRectangle.setRect(0, 0, 5 * w, 5 * w / whratio);
+  } else {
+    mRectangle.setRect(0, 0, 5 * h * whratio, 5 * h);
+  }
   mRectangle.moveCenter(rec.center());
   mRecColor = color;
   repaint();

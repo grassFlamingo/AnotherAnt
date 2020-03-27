@@ -5,12 +5,15 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
-
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QJsonValue>
+#include <QPixmap>
+#include <QPixmapCache>
+#include <QStringList>
+#include <QVector>
 
 #include <QString>
 #include <QStringList>
@@ -28,6 +31,8 @@ const static QStringList Image_Suffix = {
     "*.bmp", "*.gif", "*.jpg", "*.jpeg", "*.png",
     "*.pbm", "*.pgm", "*.ppm", "*.xbm",  "*.xpm",
 };
+
+QStringList listImageNames(const QString& root);
 
 QString path_join(const QString& parent, const QString& sub);
 
@@ -58,6 +63,9 @@ class AntConfigure {
   inline void setCropsize(int w, int h) {
     mJsonObj.insert("cropsize", QString::asprintf("%dx%d", w, h));
   }
+  inline void setCropsize(const QString& cs) {
+    mJsonObj.insert("cropsize", cs);
+  }
 
   inline QString outspace() const { return mJsonObj["outspace"].toString(); }
   inline void setOutspace(const QString& path) {
@@ -65,6 +73,19 @@ class AntConfigure {
   }
 
   inline double zoomf() const { return mJsonObj["zoomf"].toDouble(0.05); }
+
+  inline QVariant operator[](const QString& key) const {
+    return mJsonObj[key].toVariant();
+  }
+
+  inline QVariant get(const QString& key) const {
+    return mJsonObj[key].toVariant();
+  }
+
+  inline void set(const QString& key, const QVariant& value) {
+    mJsonObj.insert(key, value.toJsonValue());
+  }
+
   /**
    * @brief setZoomf
    * @param zf > 0
@@ -88,6 +109,61 @@ class AntConfigure {
 };
 
 static AntConfigure& ac = AntConfigure::configure();
+
+/**
+ * @brief The AntEditAgent class
+ */
+class AntEditProxy {
+ public:
+  class iterator;
+  struct __items {
+    bool isChecked;
+    tuple<int> cropTopLeft;
+  };
+
+ public:
+  AntEditProxy();
+  virtual ~AntEditProxy();
+
+  void loadFromAntConfig();
+  void setWorkspace(const QString& wp);
+  void setOutspace(const QString& os);
+  inline void setCropsize(int w, int h) { mCropsize = {w, h}; }
+
+  inline QString& workspace() { return mWorkspace; }
+  inline QString& outspace() { return mOutspace; }
+  inline tuple<int>& cropsize() { return mCropsize; }
+
+  iterator begin();
+  iterator end();
+
+ private:
+  QVector<__items>* mCheckList;
+  tuple<int> mCropsize;
+  QPixmapCache mWsCache;
+  QPixmapCache mOsCache;
+  QString mWorkspace;
+  QString mOutspace;
+};
+
+class iterator {
+ public:
+  iterator(AntEditProxy* parient) {
+    pthis =
+        (QVector<AntEditProxy::__items>*)(parient + offsetofclass(AntEditProxy,
+                                                                  mCheckList));
+  }
+
+  iterator prev();
+  iterator next();
+
+  QPixmap& pixmap();
+  inline bool isChecked() { return pthis->at(mIndex).isChecked; }
+
+ private:
+  int mIndex;
+  QVector<AntEditProxy::__items>* pthis;
+};
 
 };  // namespace Ant
 

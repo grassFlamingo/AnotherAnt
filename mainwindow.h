@@ -35,7 +35,6 @@ class MainWindow : public QMainWindow {
   void load_images();
 
  private slots:
-  void on_cropLabel_editingFinished();
   void on_showBoxButton_clicked();
   void on_antButton_clicked();
 
