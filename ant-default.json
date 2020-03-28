@@ -2,6 +2,6 @@
     "workspace": ".",
     "outspace": ".",
     "cropsize": "128x128",
-    "logpath": "./ant-log.json",
+    "logpath": "./ant-log.txt",
     "zoomf": 0.50
 }

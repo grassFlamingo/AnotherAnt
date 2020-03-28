@@ -76,18 +76,43 @@ int AntConfigure::saveConfigure() {
 
 /************************** AntEditProxy **************************/
 
-AntEditProxy::AntEditProxy() : mCheckList(NULL) {}
+AntEditProxy::AntEditProxy() {
+  mLogFile =
+      std::fopen(ac.getstr("logfile", "ant-log.txt").toLocal8Bit(), "rwb");
+}
 
 AntEditProxy::~AntEditProxy() {
-  if (mCheckList != NULL) {
-    delete mCheckList;
+  if (mLogFile != NULL) {
+    std::fclose(mLogFile);
+    mLogFile = NULL;
   }
+}
+
+void AntEditProxy::loadFromAntConfig() {
+  setOutspace(ac.outspace());
+  setWorkspace(ac.workspace());
+  tuple<int> cs;
+  ac.cropsize(&cs.x, &cs.y);
+  setCropsize(cs.x, cs.y);
 }
 
 void AntEditProxy::setWorkspace(const QString& wp) {
   mWorkspace = wp;
   QStringList imgs = listImageNames(wp);
-  mCheckList = new QVector<bool>(imgs.size(), false);
+  QStringList::iterator pimg = imgs.begin();
+  auto clist = QVector<__items>(imgs.size());
+  for (int i = 0; i < clist.size(); i++) {
+    __items& p = clist[i];
+    p.cropTopLeft = {0, 0};
+    p.name = *pimg;
+    pimg++;
+    if (mOutspace.isEmpty()) {
+      p.isChecked = false;
+    } else {
+      p.isChecked = QFile::exists(path_join(mOutspace, p.name));
+    }
+  }
+  mCheckList = clist;
 }
 
 void AntEditProxy::setOutspace(const QString& os) {
@@ -95,4 +120,54 @@ void AntEditProxy::setOutspace(const QString& os) {
   if (!QFile::exists(os)) {
     QDir().mkdir(os);
   }
+}
+
+bool AntEditProxy::savePixmap(const QString& name, const QPixmap& pix) {
+  if (name.endsWith(":")) {
+    return false;
+  }
+  QString path = path_join(mOutspace, name);
+  pix.save(path);
+  return QPixmapCache::insert(path, pix);
+}
+
+QPixmap* AntEditProxy::findPix(const QString& path, QString& name) {
+  if (name.endsWith(":")) {
+    return nullptr;
+  }
+  QString fullpath = path_join(path, name);
+  QPixmap* out = QPixmapCache::find(fullpath);
+  if (out == nullptr) {
+    bool _suc = QPixmapCache::insert(fullpath, QPixmap(fullpath));
+    if (!_suc) {
+      name.append(":");
+      return nullptr;
+    }
+  }
+  return QPixmapCache::find(fullpath);
+}
+
+QPixmap* AntEditProxy::findPix(const QString& path, __items* item) {
+  return findPix(path, item->name);
+}
+
+void AntEditProxy::writelog(__items* item) {
+  QByteArray date =
+      QDateTime::currentDateTime().toString("MMM dd, yyyy hh:mm:ss").toUtf8();
+
+  std::fwrite(date, sizeof(char), date.size(), mLogFile);
+
+  std::fprintf(mLogFile, "\t %d, (%d, %d, %d, %d) %s\n", item->isChecked,
+               item->cropTopLeft.x, item->cropTopLeft.y, item->cropWH.x,
+               item->cropWH.y, (const char*)item->name.toUtf8());
+}
+
+bool AntEditProxy::__iterBasic::crop(int x, int y, int w, int h) {
+  QPixmap* pix = pixmap();
+  mMe->cropTopLeft = {x, y};
+  mMe->cropWH = {w, h};
+  QPixmap out = pix->copy(x, y, x, y);
+  mMe->isChecked = pthis->savePixmap(mMe->name, out);
+  pthis->writelog(mMe);
+  return mMe->isChecked;
 }

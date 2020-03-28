@@ -24,24 +24,42 @@ void PaintBoard::setPixmap(const QPixmap &map) {
   repaint();
 }
 
-void PaintBoard::setRectangle(bool on, float whratio, const QColor &color) {
+void PaintBoard::setRectangle(int w, int h, bool on, const QColor &color) {
   if (!on) {
     mRectangle.setWidth(0);
     mRectangle.setHeight(0);
     repaint();
     return;
   }
+
   QRect rec = this->rect();
-  int h = rec.height() / 6;
-  int w = rec.width() / 6;
-  if (h * whratio > w) {
-    mRectangle.setRect(0, 0, 5 * w, 5 * w / whratio);
+  float whratio = (float)w / (float)h;
+  mCropSize = {w, h};
+  int _h = rec.height() / 6;
+  int _w = rec.width() / 6;
+  if (_h * whratio > _w) {
+    mRectangle.setRect(0, 0, 5 * _w, 5 * _w / whratio);
   } else {
-    mRectangle.setRect(0, 0, 5 * h * whratio, 5 * h);
+    mRectangle.setRect(0, 0, 5 * _h * whratio, 5 * _h);
   }
   mRectangle.moveCenter(rec.center());
   mRecColor = color;
   repaint();
+}
+
+bool PaintBoard::crop(QPixmap *out) {
+  if (out == nullptr || !isRectangleOn()) {
+    return false;
+  }
+  QPixmap bufimg(QSize(mCropSize.x, mCropSize.y));
+  QPainter painter(&bufimg);
+
+  if (mPixTopLeft.x() > mRectangle.x()) {
+    // TODO:
+  }
+
+  out->swap(bufimg);
+  return true;
 }
 
 void PaintBoard::scalePixShow(float factor, const QPoint &center) {

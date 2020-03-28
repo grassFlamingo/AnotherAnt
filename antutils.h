@@ -13,7 +13,11 @@
 #include <QPixmap>
 #include <QPixmapCache>
 #include <QStringList>
+#include <QTime>
 #include <QVector>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <QString>
 #include <QStringList>
@@ -85,6 +89,9 @@ class AntConfigure {
   inline void set(const QString& key, const QVariant& value) {
     mJsonObj.insert(key, value.toJsonValue());
   }
+  inline QString getstr(const QString& key, const QString& defstr = "") const {
+    return mJsonObj[key].toString(defstr);
+  }
 
   /**
    * @brief setZoomf
@@ -116,10 +123,10 @@ static AntConfigure& ac = AntConfigure::configure();
 class AntEditProxy {
  public:
   class iterator;
-  struct __items {
-    bool isChecked;
-    tuple<int> cropTopLeft;
-  };
+  class iteratorLoop;
+
+ private:
+  struct __items;
 
  public:
   AntEditProxy();
@@ -129,40 +136,145 @@ class AntEditProxy {
   void setWorkspace(const QString& wp);
   void setOutspace(const QString& os);
   inline void setCropsize(int w, int h) { mCropsize = {w, h}; }
+  inline int size() { return mCheckList.size(); }
+
+  bool savePixmap(const QString& name, const QPixmap& pix);
+
+  inline QPixmap* workspacePix(QString& name) {
+    return findPix(mWorkspace, name);
+  }
+  inline QPixmap* outpsacePix(QString& name) {
+    return findPix(mOutspace, name);
+  }
+  inline QPixmap* workspacePix(__items* item) {
+    return findPix(mWorkspace, item);
+  }
+  inline QPixmap* outpsacePix(__items* item) {
+    return findPix(mOutspace, item);
+  }
 
   inline QString& workspace() { return mWorkspace; }
   inline QString& outspace() { return mOutspace; }
   inline tuple<int>& cropsize() { return mCropsize; }
 
-  iterator begin();
-  iterator end();
-
- private:
-  QVector<__items>* mCheckList;
-  tuple<int> mCropsize;
-  QPixmapCache mWsCache;
-  QPixmapCache mOsCache;
-  QString mWorkspace;
-  QString mOutspace;
-};
-
-class iterator {
- public:
-  iterator(AntEditProxy* parient) {
-    pthis =
-        (QVector<AntEditProxy::__items>*)(parient + offsetofclass(AntEditProxy,
-                                                                  mCheckList));
+  inline iterator begin() { return iterator(mCheckList.begin(), this); }
+  inline iterator end() { return iterator(mCheckList.end(), this); }
+  inline iterator operator[](int i) {
+    int s = mCheckList.size();
+    i = (i + s) % s;
+    return iterator(&mCheckList[i], this);
   }
 
-  iterator prev();
-  iterator next();
+  inline iteratorLoop iterloop() {
+    return iteratorLoop(mCheckList.begin(), mCheckList.end(), this);
+  }
 
-  QPixmap& pixmap();
-  inline bool isChecked() { return pthis->at(mIndex).isChecked; }
+  void writelog(__items* item);
 
  private:
-  int mIndex;
-  QVector<AntEditProxy::__items>* pthis;
+  QPixmap* findPix(const QString& path, QString& name);
+  QPixmap* findPix(const QString& path, __items* item);
+
+ private:
+  QVector<__items> mCheckList;
+  tuple<int> mCropsize;
+  QString mWorkspace;
+  QString mOutspace;
+  FILE* mLogFile;
+
+ private:
+  struct __items {
+    bool isChecked;
+    tuple<int> cropTopLeft;
+    tuple<int> cropWH;  // crop width height
+    QString name;
+  };
+
+  class __iterBasic {
+   public:
+    constexpr __iterBasic(__items* item, AntEditProxy* parient)
+        : mMe(item), pthis(parient) {}
+
+    bool crop(int x, int y, int w, int h);
+    inline bool crop(const QRect& rect) {
+      return crop(rect.x(), rect.y(), rect.width(), rect.height());
+    }
+
+    inline QPixmap* pixmap() {
+      return mMe->isChecked ? pthis->outpsacePix(mMe)
+                            : pthis->workspacePix(mMe);
+    }
+    inline bool& isChecked() { return mMe->isChecked; }
+    inline tuple<int>& cropTopLeft() { return mMe->cropTopLeft; }
+    inline QString& name() { return mMe->name; }
+    inline QString& workspace() { return pthis->workspace(); }
+    inline QString& outspace() { return pthis->outspace(); }
+    inline tuple<int>& cropsize() { return pthis->cropsize(); }
+
+    inline bool operator==(const __iterBasic& other) {
+      return this->mMe == other.mMe;
+    }
+
+   protected:
+    __items* mMe;
+    AntEditProxy* pthis;
+  };
+
+ public:
+  class iterator : public __iterBasic {
+   public:
+    constexpr iterator(__items* item, AntEditProxy* parient)
+        : __iterBasic(item, parient) {}
+
+    inline iterator prev() { return iterator(mMe - 1, pthis); }
+    inline iterator next() { return iterator(mMe + 1, pthis); }
+    inline iterator& operator++() {
+      mMe++;
+      return *this;
+    }
+    inline iterator& operator--() {
+      mMe--;
+      return *this;
+    }
+    inline iterator& operator++(int) {
+      mMe++;
+      return *this;
+    }
+    inline iterator& operator--(int) {
+      mMe--;
+      return *this;
+    }
+  };
+
+  class iteratorLoop : public __iterBasic {
+   public:
+    constexpr iteratorLoop(__items* begin, __items* end, AntEditProxy* parient)
+        : __iterBasic(begin, parient), mBegin(begin), mEnd(end) {}
+
+    inline iteratorLoop& operator++() {
+      mMe = mMe + 1 >= mEnd ? mBegin : mMe + 1;
+      return *this;
+    }
+    inline iteratorLoop& operator++(int) {
+      mMe = mMe + 1 >= mEnd ? mBegin : mMe + 1;
+      return *this;
+    }
+    inline iteratorLoop& operator--() {
+      mMe = mMe - 1 < mBegin ? mEnd : mMe - 1;
+      return *this;
+    }
+    inline iteratorLoop& operator--(int) {
+      mMe = mMe - 1 < mBegin ? mEnd : mMe - 1;
+      return *this;
+    }
+
+    inline iteratorLoop prev() { return iteratorLoop(*this)--; }
+    inline iteratorLoop next() { return iteratorLoop(*this)++; }
+
+   private:
+    __items* mBegin;
+    __items* mEnd;
+  };
 };
 
 };  // namespace Ant

@@ -13,21 +13,18 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::initLoad() {
-  mPathws = Ant::ac.workspace();
-  mPathos = Ant::ac.outspace();
+  mEproxy.loadFromAntConfig();
+
   ui->drawMain->setZoomf(Ant::ac.zoomf());
 
-  Ant::ac.cropsize(&mCropsize.x, &mCropsize.y);
-
+  mCropsize = mEproxy.cropsize();
+  mPathws = mEproxy.workspace();
   if (mPathws.endsWith(QDir::separator())) {
     mPathws.chop(1);
   }
   ui->mainPathView->setText(mPathws.section(QDir::separator(), -1));
 
-  if (load_file_list()) {
-    load_images();
-  }
-  ui->cropLabel->setText(Ant::ac.cropsize(&mCropsize.x, &mCropsize.y));
+  ui->cropLabel->setText(Ant::ac.cropsize());
   if (ui->drawMain->isRectangleOn()) {
     ui->drawMain->setRectangle(true, (float)mCropsize.x / (float)mCropsize.y);
   }

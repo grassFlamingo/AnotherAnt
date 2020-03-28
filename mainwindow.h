@@ -56,6 +56,7 @@ class MainWindow : public QMainWindow {
   QString mPathws;
   QString mPathos;
   QStringList mFileList;
+  Ant::AntEditProxy mEproxy;
 
   LinkedRing<QPixmap> mPixRing;
   int mPixIndex;

@@ -31,11 +31,13 @@ class PaintBoard : public QWidget {
    * @param map
    */
   void setPixmap(const QPixmap &map);
-  void setRectangle(bool on = true, float whratio = 1.0,
+  void setRectangle(int w, int h, bool on = true,
                     const QColor &color = Qt::darkRed);
   inline bool isRectangleOn() const { return !mRectangle.isEmpty(); }
 
   inline void setZoomf(double zf) { mZoomBase = zf / 10.0; }
+
+  bool crop(QPixmap *out);
 
  private:
   void scalePixShow(float factor, const QPoint &center);
@@ -68,6 +70,7 @@ class PaintBoard : public QWidget {
   QPoint mDragStart;
   QRect mRectangle;
   QColor mRecColor;
+  Ant::tuple<int> mCropSize;
 };
 
 #endif // PAINTBOARD_H
