@@ -41,25 +41,17 @@ class MainWindow : public QMainWindow {
   void onDrawPrevClicked();
   void onDrawNextClicked();
 
- private:
-  inline int next_piximage_index(int i = 1) {
-    mPixIndex = (mPixIndex + i + mFileList.size()) % mFileList.size();
-    return mPixIndex;
-  }
+  void on_editBox_stateChanged(int state);
 
-  inline QString curr_piximage_path() {
-    return Ant::path_join(mPathws, mFileList[mPixIndex]);
-  }
+  void on_cropButton_clicked();
 
  private:
   Ui::MainWindow *ui;
   QString mPathws;
   QString mPathos;
-  QStringList mFileList;
   Ant::AntEditProxy mEproxy;
+  Ant::AntEditProxy::iteratorLoop mEPiter;
 
-  LinkedRing<QPixmap> mPixRing;
-  int mPixIndex;
   Ant::tuple<int> mCropsize;
   AntStatusBoard mAntBoard;
   bool isEditMode;

@@ -78,7 +78,9 @@ int AntConfigure::saveConfigure() {
 
 AntEditProxy::AntEditProxy() {
   mLogFile =
-      std::fopen(ac.getstr("logfile", "ant-log.txt").toLocal8Bit(), "rwb");
+      std::fopen(ac.getstr("logfile", "./ant-log.txt").toLocal8Bit(), "wa");
+  qDebug() << "log file on"
+           << ac.getstr("logfile", "./ant-log.txt").toLocal8Bit();
 }
 
 AntEditProxy::~AntEditProxy() {
@@ -122,7 +124,7 @@ void AntEditProxy::setOutspace(const QString& os) {
   }
 }
 
-bool AntEditProxy::savePixmap(const QString& name, const QPixmap& pix) {
+bool AntEditProxy::cacheOutPixmap(const QString& name, const QPixmap& pix) {
   if (name.endsWith(":")) {
     return false;
   }
@@ -162,12 +164,20 @@ void AntEditProxy::writelog(__items* item) {
                item->cropWH.y, (const char*)item->name.toUtf8());
 }
 
-bool AntEditProxy::__iterBasic::crop(int x, int y, int w, int h) {
-  QPixmap* pix = pixmap();
-  mMe->cropTopLeft = {x, y};
-  mMe->cropWH = {w, h};
-  QPixmap out = pix->copy(x, y, x, y);
-  mMe->isChecked = pthis->savePixmap(mMe->name, out);
+bool AntEditProxy::__iterBasic::savePixmap(const QPixmap& img, tuple<int>& tl,
+                                           tuple<int>& br) {
+  if (mMe->name.endsWith(":")) {
+    return false;
+  }
+  mMe->cropTopLeft = tl;
+  mMe->cropWH = br - tl;
+  mMe->isChecked = true;
+  tuple<int>& cs = pthis->cropsize();
+  QPixmap out = img;
+  if (img.width() != cs.x || img.height() != cs.y) {
+    out = img.scaled(cs.x, cs.y, Qt::IgnoreAspectRatio);
+  }
   pthis->writelog(mMe);
-  return mMe->isChecked;
+  pthis->cacheOutPixmap(mMe->name, out);
+  return out.save(path_join(outspace(), mMe->name));
 }

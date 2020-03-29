@@ -47,18 +47,38 @@ void PaintBoard::setRectangle(int w, int h, bool on, const QColor &color) {
   repaint();
 }
 
-bool PaintBoard::crop(QPixmap *out) {
+bool PaintBoard::crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br) {
   if (out == nullptr || !isRectangleOn()) {
     return false;
   }
   QPixmap bufimg(QSize(mCropSize.x, mCropSize.y));
+  bufimg.fill(Qt::black);
   QPainter painter(&bufimg);
 
-  if (mPixTopLeft.x() > mRectangle.x()) {
-    // TODO:
-  }
+  QRect pixrec = mPixShow.rect();
+  pixrec.moveTo(mPixTopLeft);
+  QRect crt = mRectangle.intersected(pixrec);
 
+  float _scalw = (float)mCropSize.x / mRectangle.width();
+  QPoint pixshwtl = _scalw * (crt.topLeft() - mPixTopLeft);
+  QPoint pixshwbr = _scalw * (crt.bottomRight() - mPixTopLeft);
+
+  QPixmap _destpix =
+      mPixBackup
+          .scaledToWidth(mPixShow.width() * _scalw, Qt::SmoothTransformation)
+          .copy(QRect(pixshwtl, pixshwbr));
+
+  QPoint rectl = _scalw * (crt.topLeft() - mRectangle.topLeft());
+  QPoint recbr = _scalw * (crt.bottomRight() - mRectangle.topLeft());
+
+  painter.drawPixmap(QRect(rectl, recbr), _destpix);
   out->swap(bufimg);
+  if (tl != nullptr) {
+    tl->setup(crt.topLeft());
+  }
+  if (br != nullptr) {
+    br->setup(crt.bottomRight());
+  }
   return true;
 }
 

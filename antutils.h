@@ -25,7 +25,29 @@
 namespace Ant {
 
 template <typename T>
-struct tuple {
+class tuple {
+ public:
+  constexpr tuple(T x, T y) : x(x), y(y) {}
+  constexpr tuple() : x(0), y(0) {}
+
+  inline void setup(T x, T y) {
+    this->x = x;
+    this->y = y;
+  }
+  inline void setup(const QPoint& p) {
+    this->x = p.x();
+    this->y = p.y();
+  }
+
+  inline operator QPoint() const { return QPoint(x, y); }
+  inline tuple<T> operator+(const tuple<T>& other) {
+    return tuple<T>(x + other.x, y + other.y);
+  }
+  inline tuple<T> operator-(const tuple<T>& other) {
+    return tuple<T>(x - other.x, y - other.y);
+  }
+
+ public:
   T x;
   T y;
 };
@@ -138,7 +160,7 @@ class AntEditProxy {
   inline void setCropsize(int w, int h) { mCropsize = {w, h}; }
   inline int size() { return mCheckList.size(); }
 
-  bool savePixmap(const QString& name, const QPixmap& pix);
+  bool cacheOutPixmap(const QString& name, const QPixmap& pix);
 
   inline QPixmap* workspacePix(QString& name) {
     return findPix(mWorkspace, name);
@@ -195,15 +217,21 @@ class AntEditProxy {
     constexpr __iterBasic(__items* item, AntEditProxy* parient)
         : mMe(item), pthis(parient) {}
 
-    bool crop(int x, int y, int w, int h);
-    inline bool crop(const QRect& rect) {
-      return crop(rect.x(), rect.y(), rect.width(), rect.height());
+    /**
+     * @brief savePixmap
+     * @param img
+     * @param tl top left
+     * @param br bottom right
+     * @return
+     */
+    bool savePixmap(const QPixmap& img, tuple<int>& tl, tuple<int>& br);
+
+    inline QPixmap* pixmap() { return pixmap(mMe->isChecked); }
+    // this won't change `isChecked()`
+    inline QPixmap* pixmap(bool check) {
+      return check ? pthis->outpsacePix(mMe) : pthis->workspacePix(mMe);
     }
 
-    inline QPixmap* pixmap() {
-      return mMe->isChecked ? pthis->outpsacePix(mMe)
-                            : pthis->workspacePix(mMe);
-    }
     inline bool& isChecked() { return mMe->isChecked; }
     inline tuple<int>& cropTopLeft() { return mMe->cropTopLeft; }
     inline QString& name() { return mMe->name; }
@@ -223,6 +251,7 @@ class AntEditProxy {
  public:
   class iterator : public __iterBasic {
    public:
+    constexpr iterator() : __iterBasic(nullptr, nullptr) {}
     constexpr iterator(__items* item, AntEditProxy* parient)
         : __iterBasic(item, parient) {}
 
@@ -248,6 +277,8 @@ class AntEditProxy {
 
   class iteratorLoop : public __iterBasic {
    public:
+    constexpr iteratorLoop()
+        : __iterBasic(nullptr, nullptr), mBegin(nullptr), mEnd(nullptr) {}
     constexpr iteratorLoop(__items* begin, __items* end, AntEditProxy* parient)
         : __iterBasic(begin, parient), mBegin(begin), mEnd(end) {}
 
@@ -260,11 +291,11 @@ class AntEditProxy {
       return *this;
     }
     inline iteratorLoop& operator--() {
-      mMe = mMe - 1 < mBegin ? mEnd : mMe - 1;
+      mMe = mMe - 1 < mBegin ? mEnd - 1 : mMe - 1;
       return *this;
     }
     inline iteratorLoop& operator--(int) {
-      mMe = mMe - 1 < mBegin ? mEnd : mMe - 1;
+      mMe = mMe - 1 < mBegin ? mEnd - 1 : mMe - 1;
       return *this;
     }
 

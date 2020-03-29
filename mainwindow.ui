@@ -126,11 +126,25 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="showBoxButton">
-        <property name="text">
-         <string>show box</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QPushButton" name="showBoxButton">
+          <property name="text">
+           <string>show box</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cropButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>crop</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -237,6 +251,9 @@
    <extends>QWidget</extends>
    <header location="global">widgetclick.h</header>
    <container>1</container>
+   <slots>
+    <signal>clicked()</signal>
+   </slots>
   </customwidget>
   <customwidget>
    <class>PaintBoard</class>
@@ -250,4 +267,7 @@
  </tabstops>
  <resources/>
  <connections/>
+ <slots>
+  <slot>onDrawNextClicked()</slot>
+ </slots>
 </ui>

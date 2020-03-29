@@ -7,6 +7,7 @@
 #include <QWheelEvent>
 #include <QWidget>
 
+#include <math.h>
 #include "antutils.h"
 
 /**
@@ -37,7 +38,7 @@ class PaintBoard : public QWidget {
 
   inline void setZoomf(double zf) { mZoomBase = zf / 10.0; }
 
-  bool crop(QPixmap *out);
+  bool crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br);
 
  private:
   void scalePixShow(float factor, const QPoint &center);

@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), mPixRing(16) {
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
   ui->drawMain->setFocus();
 
@@ -28,6 +28,8 @@ void MainWindow::initLoad() {
   if (ui->drawMain->isRectangleOn()) {
     ui->drawMain->setRectangle(true, (float)mCropsize.x / (float)mCropsize.y);
   }
+  mEPiter = mEproxy.iterloop();
+  load_images();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
@@ -50,67 +52,36 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
   }
 }
 
-bool MainWindow::load_file_list() {
-  QDir path(mPathws);
-  path.setNameFilters(Ant::Image_Suffix);
-  mFileList = path.entryList(QDir::Files);
-  mPixIndex = -1;
-  if (mFileList.isEmpty()) {
-    return false;
-  }
-  auto ritem = mPixRing.locate(-1);
-  ritem->id = next_piximage_index();
-  ritem->item.load(curr_piximage_path());
-
-  ritem = mPixRing.locate(0);
-  ritem->id = next_piximage_index();
-  ritem->item.load(curr_piximage_path());
-
-  ritem = mPixRing.locate(1);
-  ritem->id = next_piximage_index();
-  ritem->item.load(curr_piximage_path());
-  return true;
-}
-
 void MainWindow::load_images() {
-  QPixmap i0 = mPixRing.locate_item(0);
+  QPixmap *i0 = mEPiter.pixmap();
   ui->shapeLabel->setText(
-      QString::asprintf("%d x %d", i0.width(), i0.height()));
-  ui->drawMain->setPixmap(i0);
-  ui->drawPrev->setPixmap(mPixRing.locate_item(-1));
-  ui->drawNext->setPixmap(mPixRing.locate_item(+1));
+      QString::asprintf("%d x %d", i0->width(), i0->height()));
+  ui->drawMain->setPixmap(*i0);
+  ui->drawPrev->setPixmap(*mEPiter.prev().pixmap());
+  ui->drawNext->setPixmap(*mEPiter.next().pixmap());
+  ui->editBox->setChecked(mEPiter.isChecked());
 }
 
 void MainWindow::onDrawPrevClicked() {
-  mPixRing.back();
-  auto ritem = mPixRing.locate(-1);
-  if (ritem->id != mPixIndex) {
-    ritem->item.load(curr_piximage_path());
-    ritem->id = mPixIndex;
-  }
-  next_piximage_index(-1);
+  mEPiter--;
   load_images();
 }
 
 void MainWindow::onDrawNextClicked() {
-  mPixRing.step();
-  auto ritem = mPixRing.locate(1);
-  if (ritem->id != mPixIndex) {
-    ritem->item.load(curr_piximage_path());
-    ritem->id = mPixIndex;
-  }
-  next_piximage_index(1);
+  mEPiter++;
   load_images();
 }
 
 void MainWindow::on_showBoxButton_clicked() {
   if (ui->drawMain->isRectangleOn()) {
-    isEditMode = true;
-    ui->drawMain->setRectangle(false);
+    isEditMode = false;
+    ui->cropButton->setEnabled(false);
+    ui->drawMain->setRectangle(mCropsize.x, mCropsize.y, false);
     ui->showBoxButton->setText("show box");
   } else {
-    isEditMode = false;
-    ui->drawMain->setRectangle(true, (float)mCropsize.x / (float)mCropsize.y);
+    isEditMode = true;
+    ui->cropButton->setEnabled(true);
+    ui->drawMain->setRectangle(mCropsize.x, mCropsize.y, true);
     ui->showBoxButton->setText("hide box");
   }
   ui->drawMain->setFocus();
@@ -119,4 +90,23 @@ void MainWindow::on_showBoxButton_clicked() {
 void MainWindow::on_antButton_clicked() {
   mAntBoard.exec();
   initLoad();
+}
+
+void MainWindow::on_editBox_stateChanged(int state) {
+  QPixmap *i0 = mEPiter.pixmap(state);
+  ui->shapeLabel->setText(
+      QString::asprintf("%d x %d", i0->width(), i0->height()));
+  ui->drawMain->setPixmap(*i0);
+}
+
+void MainWindow::on_cropButton_clicked() {
+  if (!isEditMode) {
+    return;
+  }
+  QPixmap map;
+  Ant::tuple<int> tl, br;
+  if (ui->drawMain->crop(&map, &tl, &br)) {
+    mEPiter.savePixmap(map, tl, br);
+  }
+  onDrawNextClicked();
 }
