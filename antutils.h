@@ -100,6 +100,11 @@ class AntConfigure {
 
   inline double zoomf() const { return mJsonObj["zoomf"].toDouble(0.05); }
 
+  inline QString logfile() const { return mJsonObj["logpath"].toString(); }
+  inline void setLogfile(const QString& path) {
+    mJsonObj.insert("logpath", path);
+  }
+
   inline QVariant operator[](const QString& key) const {
     return mJsonObj[key].toVariant();
   }

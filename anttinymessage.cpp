@@ -5,7 +5,7 @@ AntTinyMessage::AntTinyMessage(const QString &msg, QWidget *parent)
     : QDialog(parent), ui(new Ui::AntTinyMessage) {
   ui->setupUi(this);
   ui->messageLabel->setText(msg);
-  setWindowFlag(Qt::ToolTip);
+  setWindowFlags(Qt::ToolTip | Qt::WindowStaysOnTopHint);
 }
 
 AntTinyMessage::~AntTinyMessage() { delete ui; }

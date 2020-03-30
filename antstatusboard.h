@@ -26,21 +26,22 @@ class AntStatusBoard : public QDialog {
   explicit AntStatusBoard(QWidget *parent = nullptr);
   ~AntStatusBoard();
 
- protected:
-  void mousePressEvent(QMouseEvent *event) override;
-
  private slots:
   void on_saveButton_clicked();
   void on_workspaceEdit_textEdited(const QString &path);
   void on_outspaceEdit_textEdited(const QString &path);
   void on_zoomfBox_valueChanged(double zf);
 
+  void on_logfileEdit_textChanged(const QString &arg1);
+
  private:
   Ui::AntStatusBoard *ui;
   QPalette mPassPalete;
   QPalette mWarnPalete;
-  QCompleter mCompleter;
-  QFileSystemModel mFsm;
+  QCompleter mDirComp;
+  QCompleter mFileComp;
+  QFileSystemModel mFsmDir;
+  QFileSystemModel mFsmFile;
 };
 
 #endif // ANTSTATUSBOARD_H

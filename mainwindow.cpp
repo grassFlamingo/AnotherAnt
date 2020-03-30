@@ -40,10 +40,21 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
   switch (key) {
     case Qt::Key_Right:
+    case 'n':
       onDrawNextClicked();
       break;
     case Qt::Key_Left:
+    case 'v':
       onDrawPrevClicked();
+      break;
+    case 'c':
+      on_cropButton_clicked();
+      break;
+    case 'r':
+      ui->drawMain->rotatePixmapDelta(-M_PI / 16);
+      break;
+    case 'e':
+      ui->drawMain->rotatePixmapDelta(M_PI / 16);
       break;
     case 'q':
       close();
@@ -56,7 +67,7 @@ void MainWindow::load_images() {
   QPixmap *i0 = mEPiter.pixmap();
   ui->shapeLabel->setText(
       QString::asprintf("%d x %d", i0->width(), i0->height()));
-  ui->drawMain->setPixmap(*i0);
+  ui->drawMain->setPixmap(*i0, mEPiter.isChecked());
   ui->drawPrev->setPixmap(*mEPiter.prev().pixmap());
   ui->drawNext->setPixmap(*mEPiter.next().pixmap());
   ui->editBox->setChecked(mEPiter.isChecked());

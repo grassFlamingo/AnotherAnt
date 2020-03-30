@@ -6,7 +6,7 @@ using Ant::AntConfigure;
 QStringList Ant::listImageNames(const QString& root) {
   QDir path(root);
   path.setNameFilters(Ant::Image_Suffix);
-  return path.entryList(QDir::Files);
+  return path.entryList(QDir::Files, QDir::Name);
 }
 
 QString Ant::path_join(const QString& parent, const QString& sub) {
@@ -76,12 +76,7 @@ int AntConfigure::saveConfigure() {
 
 /************************** AntEditProxy **************************/
 
-AntEditProxy::AntEditProxy() {
-  mLogFile =
-      std::fopen(ac.getstr("logfile", "./ant-log.txt").toLocal8Bit(), "wa");
-  qDebug() << "log file on"
-           << ac.getstr("logfile", "./ant-log.txt").toLocal8Bit();
-}
+AntEditProxy::AntEditProxy() { mLogFile = NULL; }
 
 AntEditProxy::~AntEditProxy() {
   if (mLogFile != NULL) {
@@ -96,6 +91,11 @@ void AntEditProxy::loadFromAntConfig() {
   tuple<int> cs;
   ac.cropsize(&cs.x, &cs.y);
   setCropsize(cs.x, cs.y);
+  if (mLogFile != NULL) {
+    fclose(mLogFile);
+  }
+  mLogFile =
+      std::fopen(ac.getstr("logfile", "./ant-log.txt").toLocal8Bit(), "wa");
 }
 
 void AntEditProxy::setWorkspace(const QString& wp) {

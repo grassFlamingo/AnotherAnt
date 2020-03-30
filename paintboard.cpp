@@ -5,10 +5,16 @@ PaintBoard::PaintBoard(QWidget *parent)
   mZoomBase = Ant::ac.zoomf() / 10.0;
 }
 
-void PaintBoard::setPixmap(const QPixmap &map) {
+void PaintBoard::setPixmap(const QPixmap &map, bool alignrec) {
   mPixBackup = map;
+  mRotateAngle = 0.0f;
 
-  mPixShow = map.scaled(size(), Qt::KeepAspectRatio);
+  if (alignrec && isRectangleOn()) {
+    mPixShow = map.scaled(mRectangle.size(), Qt::KeepAspectRatio);
+  } else {
+    mPixShow = map.scaled(size(), Qt::KeepAspectRatio);
+  }
+
   QSize ssize = mPixShow.size();
   QSize bsize = mPixBackup.size();
 
@@ -20,7 +26,24 @@ void PaintBoard::setPixmap(const QPixmap &map) {
   QRect rpix = mPixShow.rect();
   QPoint lt = rbod.bottomRight() - rpix.bottomRight();
   mPixTopLeft = lt / 2;
+  mPixShowR = mPixShow;
 
+  repaint();
+}
+
+void PaintBoard::rotatePixmap(double angle) {
+  /*
+   * SO(2)
+   * cos  -sin
+   * sin   cos
+   */
+  // k = (int) angle / (2 pi)
+  angle = std::fmod(angle + 2 * M_PI, 2 * M_PI);
+  if (angle < 0) {
+    angle = std::fmod(angle + 2 * M_PI, 2 * M_PI);
+  }
+  mRotateAngle = angle;
+  rotatePixShow();
   repaint();
 }
 
@@ -47,6 +70,9 @@ void PaintBoard::setRectangle(int w, int h, bool on, const QColor &color) {
   repaint();
 }
 
+#include <QDialog>
+#include <QLabel>
+
 bool PaintBoard::crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br) {
   if (out == nullptr || !isRectangleOn()) {
     return false;
@@ -63,13 +89,20 @@ bool PaintBoard::crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br) {
   QPoint pixshwtl = _scalw * (crt.topLeft() - mPixTopLeft);
   QPoint pixshwbr = _scalw * (crt.bottomRight() - mPixTopLeft);
 
-  QPixmap _destpix =
-      mPixBackup
-          .scaledToWidth(mPixShow.width() * _scalw, Qt::SmoothTransformation)
-          .copy(QRect(pixshwtl, pixshwbr));
-
   QPoint rectl = _scalw * (crt.topLeft() - mRectangle.topLeft());
   QPoint recbr = _scalw * (crt.bottomRight() - mRectangle.topLeft());
+
+  QPixmap mpix = mPixBackup;
+  if (mRotateAngle > 1e-5) {
+    double sinx = std::sin(mRotateAngle);
+    double cosx = std::cos(mRotateAngle);
+    QMatrix rot(cosx, -sinx, sinx, cosx, 0, 0);
+    mpix = mPixBackup.transformed(rot);
+  }
+
+  QPixmap _destpix =
+      mpix.scaledToWidth(mPixShow.width() * _scalw, Qt::SmoothTransformation)
+          .copy(QRect(pixshwtl, pixshwbr));
 
   painter.drawPixmap(QRect(rectl, recbr), _destpix);
   out->swap(bufimg);
@@ -88,6 +121,7 @@ void PaintBoard::scalePixShow(float factor, const QPoint &center) {
   // relative to this widget
   QPoint cp2tl = mPixTopLeft - center;
   mPixTopLeft = center + cp2tl * factor;
+  mPixShowR = mPixShow;
 }
 
 void PaintBoard::scalePixShowDelta(int delta, const QPoint &center) {
@@ -98,6 +132,16 @@ void PaintBoard::scalePixShowDelta(int delta, const QPoint &center) {
     fac = -1.0 / (fac - 1.0);
   }
   scalePixShow(fac, center);
+}
+
+void PaintBoard::rotatePixShow() {
+  double sinx = std::sin(mRotateAngle);
+  double cosx = std::cos(mRotateAngle);
+  // scaled SO(2)
+  QMatrix rot(cosx, -sinx, sinx, cosx, 0, 0);
+  QPoint ocent = mPixShow.rect().center();
+  mPixShow = mPixShowR.transformed(rot);
+  mPixTopLeft += ocent - mPixShow.rect().center();
 }
 
 void PaintBoard::wheelEvent(QWheelEvent *event) {

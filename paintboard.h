@@ -2,10 +2,12 @@
 #define PAINTBOARD_H
 
 #include <QDebug>
+#include <QMatrix>
 #include <QPainter>
 #include <QPixmap>
 #include <QWheelEvent>
 #include <QWidget>
+#include <QtMath>
 
 #include <math.h>
 #include "antutils.h"
@@ -30,19 +32,28 @@ class PaintBoard : public QWidget {
    * @brief setPixmap
    * defalut locate at the center
    * @param map
+   * @param alignrec align to Rectangle
    */
-  void setPixmap(const QPixmap &map);
+  void setPixmap(const QPixmap &map, bool alignrec = false);
   void setRectangle(int w, int h, bool on = true,
                     const QColor &color = Qt::darkRed);
   inline bool isRectangleOn() const { return !mRectangle.isEmpty(); }
 
   inline void setZoomf(double zf) { mZoomBase = zf / 10.0; }
 
+  // rotate `angle`
+  void rotatePixmap(double angle);
+  // rotate `mRotateAngle + delta`
+  inline void rotatePixmapDelta(double delta) {
+    rotatePixmap(mRotateAngle + delta);
+  }
+
   bool crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br);
 
  private:
   void scalePixShow(float factor, const QPoint &center);
   void scalePixShowDelta(int delta, const QPoint &center);
+  void rotatePixShow();
 
  protected:
   /**
@@ -63,6 +74,7 @@ class PaintBoard : public QWidget {
  private:
   QPixmap mPixBackup;
   QPixmap mPixShow;
+  QPixmap mPixShowR;  // pix show rotated
   QPoint mPixTopLeft;
   QPoint mPixMoved;
   bool mIsDrag;
@@ -72,6 +84,7 @@ class PaintBoard : public QWidget {
   QRect mRectangle;
   QColor mRecColor;
   Ant::tuple<int> mCropSize;
+  double mRotateAngle;
 };
 
 #endif // PAINTBOARD_H
