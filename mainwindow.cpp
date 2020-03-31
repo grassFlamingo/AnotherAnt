@@ -58,6 +58,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     case 'e':
       ui->drawMain->rotatePixmapDelta(M_PI / 8);
       break;
+    case 'd':
+      remove_edited_image();
+      break;
     case 'q':
       close();
     default:
@@ -126,4 +129,11 @@ void MainWindow::on_cropButton_clicked() {
     mEPiter.savePixmap(map, tl, br);
   }
   onDrawNextClicked();
+}
+
+void MainWindow::remove_edited_image() {
+  mEPiter.removePixmap();
+  load_images();
+  ui->progressLabel->setText(QString::asprintf(
+      "[%d] %d/%d", mEproxy.count(), mEPiter.locate(), mEproxy.size()));
 }

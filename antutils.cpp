@@ -187,8 +187,20 @@ bool AntEditProxy::__iterBasic::savePixmap(const QPixmap& img, tuple<int>& tl,
     return false;
   }
   if (mMe->isChecked == false) {
-    pthis->setpCounter();
+    pthis->stepCounter();
   }
   mMe->isChecked = true;
   return true;
+}
+
+void AntEditProxy::__iterBasic::removePixmap() {
+  if (mMe->name.endsWith(":")) {
+    return;
+  }
+  mMe->cropTopLeft.setup(0, 0);
+  QFile::remove(path_join(outspace(), mMe->name));
+  if (mMe->isChecked) {
+    pthis->stepCounter(-1);
+  }
+  mMe->isChecked = false;
 }

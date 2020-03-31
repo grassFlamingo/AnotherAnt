@@ -202,7 +202,7 @@ class AntEditProxy {
  private:
   QPixmap* findPix(const QString& path, QString& name);
   QPixmap* findPix(const QString& path, __items* item);
-  inline void setpCounter() { mCounter++; }
+  inline void stepCounter(int i = 1) { mCounter += i; }
   inline __items* clistBegin() { return mCheckList.begin(); }
 
  private:
@@ -234,6 +234,8 @@ class AntEditProxy {
      * @return
      */
     bool savePixmap(const QPixmap& img, tuple<int>& tl, tuple<int>& br);
+
+    void removePixmap();
 
     inline int locate() { return mMe - pthis->clistBegin(); }
 

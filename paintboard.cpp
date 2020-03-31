@@ -241,7 +241,7 @@ void PaintBoard::keyPressEvent(QKeyEvent *event) {
     case 'a':
       scalePixShowDelta(1, this->rect().center());
       break;
-    case 'd':
+    case 's':
       scalePixShowDelta(-1, this->rect().center());
       break;
     default:

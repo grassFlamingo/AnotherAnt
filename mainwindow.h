@@ -2,12 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QDebug>
+#include <QDir>
 #include <QFileDialog>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QLinkedList>
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QDir>
 
 #include "antstatusboard.h"
 #include "antutils.h"
@@ -44,6 +45,9 @@ class MainWindow : public QMainWindow {
   void on_editBox_stateChanged(int state);
 
   void on_cropButton_clicked();
+
+ private:
+  void remove_edited_image();
 
  private:
   Ui::MainWindow *ui;
