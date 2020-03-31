@@ -30,6 +30,8 @@ void MainWindow::initLoad() {
   }
   mEPiter = mEproxy.iterloop();
   load_images();
+  ui->progressLabel->setText(QString::asprintf(
+      "[%d] %d/%d", mEproxy.count(), mEPiter.locate(), mEproxy.size()));
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
@@ -51,10 +53,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
       on_cropButton_clicked();
       break;
     case 'r':
-      ui->drawMain->rotatePixmapDelta(-M_PI / 16);
+      ui->drawMain->rotatePixmapDelta(-M_PI / 8);
       break;
     case 'e':
-      ui->drawMain->rotatePixmapDelta(M_PI / 16);
+      ui->drawMain->rotatePixmapDelta(M_PI / 8);
       break;
     case 'q':
       close();
@@ -74,11 +76,15 @@ void MainWindow::load_images() {
 }
 
 void MainWindow::onDrawPrevClicked() {
+  ui->progressLabel->setText(QString::asprintf(
+      "[%d] %d/%d", mEproxy.count(), mEPiter.locate(), mEproxy.size()));
   mEPiter--;
   load_images();
 }
 
 void MainWindow::onDrawNextClicked() {
+  ui->progressLabel->setText(QString::asprintf(
+      "[%d] %d/%d", mEproxy.count(), mEPiter.locate(), mEproxy.size()));
   mEPiter++;
   load_images();
 }

@@ -164,6 +164,7 @@ class AntEditProxy {
   void setOutspace(const QString& os);
   inline void setCropsize(int w, int h) { mCropsize = {w, h}; }
   inline int size() { return mCheckList.size(); }
+  inline int count() { return mCounter; }
 
   bool cacheOutPixmap(const QString& name, const QPixmap& pix);
 
@@ -201,6 +202,8 @@ class AntEditProxy {
  private:
   QPixmap* findPix(const QString& path, QString& name);
   QPixmap* findPix(const QString& path, __items* item);
+  inline void setpCounter() { mCounter++; }
+  inline __items* clistBegin() { return mCheckList.begin(); }
 
  private:
   QVector<__items> mCheckList;
@@ -208,6 +211,7 @@ class AntEditProxy {
   QString mWorkspace;
   QString mOutspace;
   FILE* mLogFile;
+  int mCounter;  // count isChecked
 
  private:
   struct __items {
@@ -230,6 +234,8 @@ class AntEditProxy {
      * @return
      */
     bool savePixmap(const QPixmap& img, tuple<int>& tl, tuple<int>& br);
+
+    inline int locate() { return mMe - pthis->clistBegin(); }
 
     inline QPixmap* pixmap() { return pixmap(mMe->isChecked); }
     // this won't change `isChecked()`

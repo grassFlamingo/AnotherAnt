@@ -54,6 +54,7 @@ class PaintBoard : public QWidget {
   void scalePixShow(float factor, const QPoint &center);
   void scalePixShowDelta(int delta, const QPoint &center);
   void rotatePixShow();
+  QPixmap rotate(float angle, const QPixmap &pix);
 
  protected:
   /**
@@ -62,11 +63,11 @@ class PaintBoard : public QWidget {
    */
   void wheelEvent(QWheelEvent *event) override;
   void paintEvent(QPaintEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
 
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
-
   void keyPressEvent(QKeyEvent *event) override;
 
  signals:

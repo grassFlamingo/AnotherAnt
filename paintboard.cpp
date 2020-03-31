@@ -70,9 +70,6 @@ void PaintBoard::setRectangle(int w, int h, bool on, const QColor &color) {
   repaint();
 }
 
-#include <QDialog>
-#include <QLabel>
-
 bool PaintBoard::crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br) {
   if (out == nullptr || !isRectangleOn()) {
     return false;
@@ -92,13 +89,8 @@ bool PaintBoard::crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br) {
   QPoint rectl = _scalw * (crt.topLeft() - mRectangle.topLeft());
   QPoint recbr = _scalw * (crt.bottomRight() - mRectangle.topLeft());
 
-  QPixmap mpix = mPixBackup;
-  if (mRotateAngle > 1e-5) {
-    double sinx = std::sin(mRotateAngle);
-    double cosx = std::cos(mRotateAngle);
-    QMatrix rot(cosx, -sinx, sinx, cosx, 0, 0);
-    mpix = mPixBackup.transformed(rot);
-  }
+  QPixmap mpix =
+      mRotateAngle < 1e-5 ? mPixBackup : rotate(mRotateAngle, mPixBackup);
 
   QPixmap _destpix =
       mpix.scaledToWidth(mPixShow.width() * _scalw, Qt::SmoothTransformation)
@@ -117,7 +109,9 @@ bool PaintBoard::crop(QPixmap *out, Ant::tuple<int> *tl, Ant::tuple<int> *br) {
 
 void PaintBoard::scalePixShow(float factor, const QPoint &center) {
   mZoomf *= factor;
-  mPixShow = mPixBackup.scaled(mPixBackup.size() * mZoomf, Qt::KeepAspectRatio);
+  QPixmap mpix =
+      mRotateAngle < 1e-5 ? mPixBackup : rotate(mRotateAngle, mPixBackup);
+  mPixShow = mpix.scaled(mPixBackup.size() * mZoomf, Qt::KeepAspectRatio);
   // relative to this widget
   QPoint cp2tl = mPixTopLeft - center;
   mPixTopLeft = center + cp2tl * factor;
@@ -142,6 +136,13 @@ void PaintBoard::rotatePixShow() {
   QPoint ocent = mPixShow.rect().center();
   mPixShow = mPixShowR.transformed(rot);
   mPixTopLeft += ocent - mPixShow.rect().center();
+}
+
+QPixmap PaintBoard::rotate(float angle, const QPixmap &pix) {
+  double sinx = std::sin(angle);
+  double cosx = std::cos(angle);
+  QMatrix rot(cosx, -sinx, sinx, cosx, 0, 0);
+  return pix.transformed(rot);
 }
 
 void PaintBoard::wheelEvent(QWheelEvent *event) {
@@ -179,6 +180,15 @@ void PaintBoard::paintEvent(QPaintEvent *event) {
   painter.drawPoint(mRectangle.topRight());
   painter.drawPoint(mRectangle.bottomLeft());
   painter.drawPoint(mRectangle.bottomRight());
+}
+
+void PaintBoard::resizeEvent(QResizeEvent *event) {
+  setRectangle(mRectangle.width(), mRectangle.height(), isRectangleOn());
+  setPixmap(mPixBackup);
+  if (mRotateAngle > 1e-5) {
+    rotatePixmap(mRotateAngle);
+  }
+  QWidget::resizeEvent(event);
 }
 
 void PaintBoard::mousePressEvent(QMouseEvent *event) {

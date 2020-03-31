@@ -76,7 +76,7 @@ int AntConfigure::saveConfigure() {
 
 /************************** AntEditProxy **************************/
 
-AntEditProxy::AntEditProxy() { mLogFile = NULL; }
+AntEditProxy::AntEditProxy() : mLogFile(NULL), mCounter(0) {}
 
 AntEditProxy::~AntEditProxy() {
   if (mLogFile != NULL) {
@@ -100,6 +100,7 @@ void AntEditProxy::loadFromAntConfig() {
 
 void AntEditProxy::setWorkspace(const QString& wp) {
   mWorkspace = wp;
+  mCounter = 0;
   QStringList imgs = listImageNames(wp);
   QStringList::iterator pimg = imgs.begin();
   auto clist = QVector<__items>(imgs.size());
@@ -112,6 +113,9 @@ void AntEditProxy::setWorkspace(const QString& wp) {
       p.isChecked = false;
     } else {
       p.isChecked = QFile::exists(path_join(mOutspace, p.name));
+      if (p.isChecked) {
+        mCounter++;
+      }
     }
   }
   mCheckList = clist;
@@ -171,7 +175,6 @@ bool AntEditProxy::__iterBasic::savePixmap(const QPixmap& img, tuple<int>& tl,
   }
   mMe->cropTopLeft = tl;
   mMe->cropWH = br - tl;
-  mMe->isChecked = true;
   tuple<int>& cs = pthis->cropsize();
   QPixmap out = img;
   if (img.width() != cs.x || img.height() != cs.y) {
@@ -179,5 +182,13 @@ bool AntEditProxy::__iterBasic::savePixmap(const QPixmap& img, tuple<int>& tl,
   }
   pthis->writelog(mMe);
   pthis->cacheOutPixmap(mMe->name, out);
-  return out.save(path_join(outspace(), mMe->name));
+  bool suc = out.save(path_join(outspace(), mMe->name));
+  if (!suc) {
+    return false;
+  }
+  if (mMe->isChecked == false) {
+    pthis->setpCounter();
+  }
+  mMe->isChecked = true;
+  return true;
 }
