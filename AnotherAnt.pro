@@ -30,8 +30,7 @@ HEADERS += \
     antutils.h \
     mainwindow.h \
     paintboard.h \
-    widgetclick.h \
-    linkedring.h
+    widgetclick.h
 
 FORMS += \
     antstatusboard.ui \
