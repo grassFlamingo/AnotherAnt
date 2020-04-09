@@ -1,7 +1,9 @@
 {
     "workspace": ".",
+    "workdir": ".",
     "outspace": ".",
     "cropsize": "128x128",
     "logpath": "./ant-log.txt",
-    "zoomf": 0.50
+    "zoomf": 0.50,
+    "labels": ["a", "b", "c"]
 }

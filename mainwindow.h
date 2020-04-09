@@ -12,7 +12,6 @@
 
 #include "antstatusboard.h"
 #include "antutils.h"
-#include "linkedring.h"
 #include "widgetclick.h"
 
 QT_BEGIN_NAMESPACE

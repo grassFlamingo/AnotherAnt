@@ -58,7 +58,8 @@ const static QStringList Image_Suffix = {
     "*.pbm", "*.pgm", "*.ppm", "*.xbm",  "*.xpm",
 };
 
-QStringList listImageNames(const QString& root);
+QStringList listImageNames(const QString& root, const QDir& sub = QDir());
+QStringList listSubfolders(const QString& root, const QDir& sub = QDir());
 
 QString path_join(const QString& parent, const QString& sub);
 
@@ -215,6 +216,8 @@ class AntEditProxy {
 
  private:
   struct __items {
+    QString labelName;
+    int labelID;
     bool isChecked;
     tuple<int> cropTopLeft;
     tuple<int> cropWH;  // crop width height

@@ -3,10 +3,21 @@
 using namespace Ant;
 using Ant::AntConfigure;
 
-QStringList Ant::listImageNames(const QString& root) {
+QStringList Ant::listImageNames(const QString& root, const QDir& sub) {
   QDir path(root);
+  if (!sub.isEmpty()) {
+    path.cd(sub.absolutePath());
+  }
   path.setNameFilters(Ant::Image_Suffix);
   return path.entryList(QDir::Files, QDir::Name);
+}
+
+QStringList Ant::listSubfolders(const QString& root, const QDir& sub) {
+  QDir path(root);
+  if (!sub.isEmpty()) {
+    path.cd(sub.absolutePath());
+  }
+  return path.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 }
 
 QString Ant::path_join(const QString& parent, const QString& sub) {
