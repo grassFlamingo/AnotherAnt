@@ -6,7 +6,7 @@ using Ant::AntConfigure;
 QStringList Ant::listImageNames(const QString& root, const QDir& sub) {
   QDir path(root);
   if (!sub.isEmpty()) {
-    path.cd(sub.absolutePath());
+    path.setPath(sub.relativeFilePath(root));
   }
   path.setNameFilters(Ant::Image_Suffix);
   return path.entryList(QDir::Files, QDir::Name);
@@ -15,7 +15,7 @@ QStringList Ant::listImageNames(const QString& root, const QDir& sub) {
 QStringList Ant::listSubfolders(const QString& root, const QDir& sub) {
   QDir path(root);
   if (!sub.isEmpty()) {
-    path.cd(sub.absolutePath());
+    path.setPath(sub.relativeFilePath(root));
   }
   return path.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 }

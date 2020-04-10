@@ -2,4 +2,8 @@
     <qresource prefix="/json">
         <file>ant-default.json</file>
     </qresource>
+    <qresource prefix="/doc">
+        <file>ant-help.md</file>
+        <file>ant-help.html</file>
+    </qresource>
 </RCC>
