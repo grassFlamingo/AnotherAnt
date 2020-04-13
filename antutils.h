@@ -106,6 +106,23 @@ class AntConfigure {
     mJsonObj.insert("logpath", path);
   }
 
+  QStringList annotations() const {
+    QJsonArray ann = mJsonObj["annotations"].toArray();
+    QStringList out;
+    for (auto a : ann) {
+      out.append(a.toString());
+    }
+    return out;
+  }
+
+  void setAnnotations(const QStringList& list) {
+    QJsonArray ann;
+    for (auto l : list) {
+      ann.append(l);
+    }
+    mJsonObj.insert("annotations", ann);
+  }
+
   inline QVariant operator[](const QString& key) const {
     return mJsonObj[key].toVariant();
   }
@@ -217,11 +234,11 @@ class AntEditProxy {
  private:
   struct __items {
     QString labelName;
-    int labelID;
+    int annID;
     bool isChecked;
     tuple<int> cropTopLeft;
     tuple<int> cropWH;  // crop width height
-    QString name;
+    QString annName;
   };
 
   class __iterBasic {
@@ -240,6 +257,11 @@ class AntEditProxy {
 
     void removePixmap();
 
+    inline void setAnnotation(const QString& name) {
+      mMe->annID = 0;
+      mMe->labelName = name;
+    }
+
     inline int locate() { return mMe - pthis->clistBegin(); }
 
     inline QPixmap* pixmap() { return pixmap(mMe->isChecked); }
@@ -250,7 +272,7 @@ class AntEditProxy {
 
     inline bool& isChecked() { return mMe->isChecked; }
     inline tuple<int>& cropTopLeft() { return mMe->cropTopLeft; }
-    inline QString& name() { return mMe->name; }
+    inline QString& name() { return mMe->annName; }
     inline QString& workspace() { return pthis->workspace(); }
     inline QString& outspace() { return pthis->outspace(); }
     inline tuple<int>& cropsize() { return pthis->cropsize(); }

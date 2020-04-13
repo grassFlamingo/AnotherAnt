@@ -30,10 +30,6 @@ class MainWindow : public QMainWindow {
  protected:
   void keyPressEvent(QKeyEvent *event) override;
 
- private:
-  bool load_file_list();
-  void load_images();
-
  private slots:
   void on_showBoxButton_clicked();
   void on_antButton_clicked();
@@ -46,6 +42,9 @@ class MainWindow : public QMainWindow {
   void on_cropButton_clicked();
 
  private:
+  bool load_file_list();
+  void load_images();
+  void load_annotations();
   void remove_edited_image();
 
  private:

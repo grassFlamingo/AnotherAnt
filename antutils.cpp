@@ -118,12 +118,12 @@ void AntEditProxy::setWorkspace(const QString& wp) {
   for (int i = 0; i < clist.size(); i++) {
     __items& p = clist[i];
     p.cropTopLeft = {0, 0};
-    p.name = *pimg;
+    p.annName = *pimg;
     pimg++;
     if (mOutspace.isEmpty()) {
       p.isChecked = false;
     } else {
-      p.isChecked = QFile::exists(path_join(mOutspace, p.name));
+      p.isChecked = QFile::exists(path_join(mOutspace, p.annName));
       if (p.isChecked) {
         mCounter++;
       }
@@ -165,7 +165,7 @@ QPixmap* AntEditProxy::findPix(const QString& path, QString& name) {
 }
 
 QPixmap* AntEditProxy::findPix(const QString& path, __items* item) {
-  return findPix(path, item->name);
+  return findPix(path, item->annName);
 }
 
 void AntEditProxy::writelog(__items* item) {
@@ -176,12 +176,12 @@ void AntEditProxy::writelog(__items* item) {
 
   std::fprintf(mLogFile, "\t %d, (%d, %d, %d, %d) %s\n", item->isChecked,
                item->cropTopLeft.x, item->cropTopLeft.y, item->cropWH.x,
-               item->cropWH.y, (const char*)item->name.toUtf8());
+               item->cropWH.y, (const char*)item->annName.toUtf8());
 }
 
 bool AntEditProxy::__iterBasic::savePixmap(const QPixmap& img, tuple<int>& tl,
                                            tuple<int>& br) {
-  if (mMe->name.endsWith(":")) {
+  if (mMe->annName.endsWith(":")) {
     return false;
   }
   mMe->cropTopLeft = tl;
@@ -192,8 +192,8 @@ bool AntEditProxy::__iterBasic::savePixmap(const QPixmap& img, tuple<int>& tl,
     out = img.scaled(cs.x, cs.y, Qt::IgnoreAspectRatio);
   }
   pthis->writelog(mMe);
-  pthis->cacheOutPixmap(mMe->name, out);
-  bool suc = out.save(path_join(outspace(), mMe->name));
+  pthis->cacheOutPixmap(mMe->annName, out);
+  bool suc = out.save(path_join(outspace(), mMe->annName));
   if (!suc) {
     return false;
   }
@@ -205,11 +205,11 @@ bool AntEditProxy::__iterBasic::savePixmap(const QPixmap& img, tuple<int>& tl,
 }
 
 void AntEditProxy::__iterBasic::removePixmap() {
-  if (mMe->name.endsWith(":")) {
+  if (mMe->annName.endsWith(":")) {
     return;
   }
   mMe->cropTopLeft.setup(0, 0);
-  QFile::remove(path_join(outspace(), mMe->name));
+  QFile::remove(path_join(outspace(), mMe->annName));
   if (mMe->isChecked) {
     pthis->stepCounter(-1);
   }

@@ -284,8 +284,8 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLabel" name="labelLabel">
+            <item>
+       <widget class="QLabel" name="annLabel">
         <property name="text">
          <string>Labels</string>
         </property>

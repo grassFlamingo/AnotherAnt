@@ -32,6 +32,8 @@ void MainWindow::initLoad() {
   load_images();
   ui->progressLabel->setText(QString::asprintf(
       "[%d] %d/%d", mEproxy.count(), mEPiter.locate(), mEproxy.size()));
+
+  load_annotations();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
@@ -76,6 +78,13 @@ void MainWindow::load_images() {
   ui->drawPrev->setPixmap(*mEPiter.prev().pixmap());
   ui->drawNext->setPixmap(*mEPiter.next().pixmap());
   ui->editBox->setChecked(mEPiter.isChecked());
+}
+
+void MainWindow::load_annotations() {
+  QStringList ann = Ant::ac.annotations();
+  ann.append("<a href='+'>+</a>");
+  qDebug() << ann;
+  ui->annLabel->setText(ann.join(", "));
 }
 
 void MainWindow::onDrawPrevClicked() {
@@ -136,4 +145,12 @@ void MainWindow::remove_edited_image() {
   load_images();
   ui->progressLabel->setText(QString::asprintf(
       "[%d] %d/%d", mEproxy.count(), mEPiter.locate(), mEproxy.size()));
+}
+
+void MainWindow::on_annLabel_linkActivated(const QString &link) {
+  if (link == "+") {
+    // append new annotation
+  } else {
+    // label licked
+  }
 }
