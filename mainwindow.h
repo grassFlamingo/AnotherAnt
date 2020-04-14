@@ -41,6 +41,8 @@ class MainWindow : public QMainWindow {
 
   void on_cropButton_clicked();
 
+  void on_annLabel_linkActivated(const QString &link);
+
  private:
   bool load_file_list();
   void load_images();

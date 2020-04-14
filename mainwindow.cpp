@@ -81,10 +81,16 @@ void MainWindow::load_images() {
 }
 
 void MainWindow::load_annotations() {
-  QStringList ann = Ant::ac.annotations();
-  ann.append("<a href='+'>+</a>");
-  qDebug() << ann;
-  ui->annLabel->setText(ann.join(", "));
+  QVector<Ant::AnnTag> ann = Ant::ac.annotations();
+  QString txt(
+      "<html><head><style> a { text-decoration: none; } </style><head/><body>");
+  for (auto &t : ann) {
+    txt.append(QString("<a href='%1'>").arg(t.id));
+    txt.append(t.label);
+    txt.append("</a>&emsp;");
+  }
+  txt.append("</body></html>");
+  ui->annLabel->setText(txt);
 }
 
 void MainWindow::onDrawPrevClicked() {
@@ -148,9 +154,10 @@ void MainWindow::remove_edited_image() {
 }
 
 void MainWindow::on_annLabel_linkActivated(const QString &link) {
-  if (link == "+") {
-    // append new annotation
-  } else {
-    // label licked
+  // label licked
+  bool ok = false;
+  int id = link.toInt(&ok);
+  if (ok) {
+    mEPiter.setAnnotation(id);
   }
 }

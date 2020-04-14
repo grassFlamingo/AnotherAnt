@@ -5,5 +5,9 @@
     "cropsize": "128x128",
     "logpath": "./ant-log.txt",
     "zoomf": 0.50,
-    "annotations": ["a", "b", "c"]
+    "annotations": [
+      {"label": "a", "id": 1},
+      {"label": "b", "id": 2},
+      {"label": "c", "id": 3}
+    ]
 }

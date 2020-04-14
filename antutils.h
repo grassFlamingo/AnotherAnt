@@ -63,6 +63,29 @@ QStringList listSubfolders(const QString& root, const QDir& sub = QDir());
 
 QString path_join(const QString& parent, const QString& sub);
 
+// annotation tag
+class AnnTag {
+ public:
+  AnnTag() : label(""), id(-1) {}
+
+  AnnTag(const QString& label, const int& id) {
+    this->label = label;
+    this->id = id;
+  }
+
+  operator QJsonObject() {
+    QJsonObject obj;
+    obj.insert("label", label);
+    obj.insert("id", id);
+    return obj;
+  }
+  inline operator QJsonValue() { return QJsonValue((QJsonObject) * this); }
+
+ public:
+  QString label;
+  int id;
+};
+
 class AntConfigure {
  public:
   /**
@@ -106,16 +129,17 @@ class AntConfigure {
     mJsonObj.insert("logpath", path);
   }
 
-  QStringList annotations() const {
+  QVector<AnnTag> annotations() const {
     QJsonArray ann = mJsonObj["annotations"].toArray();
-    QStringList out;
+    QVector<AnnTag> out(ann.size());
     for (auto a : ann) {
-      out.append(a.toString());
+      QJsonObject oa = a.toObject();
+      out.append(AnnTag(oa["label"].toString(), oa["id"].toInt()));
     }
     return out;
   }
 
-  void setAnnotations(const QStringList& list) {
+  void setAnnotations(const QVector<AnnTag>& list) {
     QJsonArray ann;
     for (auto l : list) {
       ann.append(l);
@@ -233,12 +257,11 @@ class AntEditProxy {
 
  private:
   struct __items {
-    QString labelName;
     int annID;
     bool isChecked;
     tuple<int> cropTopLeft;
     tuple<int> cropWH;  // crop width height
-    QString annName;
+    QString name;
   };
 
   class __iterBasic {
@@ -257,10 +280,7 @@ class AntEditProxy {
 
     void removePixmap();
 
-    inline void setAnnotation(const QString& name) {
-      mMe->annID = 0;
-      mMe->labelName = name;
-    }
+    inline void setAnnotation(const int& id) { mMe->annID = id; }
 
     inline int locate() { return mMe - pthis->clistBegin(); }
 
@@ -272,7 +292,7 @@ class AntEditProxy {
 
     inline bool& isChecked() { return mMe->isChecked; }
     inline tuple<int>& cropTopLeft() { return mMe->cropTopLeft; }
-    inline QString& name() { return mMe->annName; }
+    inline QString& name() { return mMe->name; }
     inline QString& workspace() { return pthis->workspace(); }
     inline QString& outspace() { return pthis->outspace(); }
     inline tuple<int>& cropsize() { return pthis->cropsize(); }
